@@ -1,0 +1,24 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxtjs/tailwindcss": "^6.12.1",
+    "@pinia/nuxt": "^0.5.1",
+    "firebase": "^10.12.4",
+    "nuxt": "^3.12.4",
+    "nuxt-vuefire": "^1.0.3",
+    "pinia": "^2.1.7",
+    "vue": "latest"
+  },
+  "overrides": {
+    "vue": "latest"
+  }
+}
