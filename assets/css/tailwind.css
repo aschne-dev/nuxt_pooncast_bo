@@ -3,3 +3,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .btn {
+        @apply bg-secondary text-white px-3 py-2 rounded-md text-sm shadow-xl hover:bg-tertiary transition ease-out duration-300;
+    }
+
+    input {
+        @apply my-2 rounded px-2;
+    }
+
+    h1 {
+        @apply font-fraunces uppercase text-xl text-secondary font-bold;
+    }
+}
