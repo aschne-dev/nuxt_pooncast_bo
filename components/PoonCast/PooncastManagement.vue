@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h2>Episodes for Season {{ seasonId }}</h2>
     <ul>
       <li v-for="episode in episodes" :key="episode.id">{{ episode.titre }}</li>
     </ul>
@@ -8,29 +7,25 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import { usePooncastStore } from '@/stores/Pooncast';
 
 const props = defineProps({
   seasonId: Number
 });
 
-const episodes = ref([]);
-const podcastsStore = usePooncastStore();
+const pooncastStore = usePooncastStore();
 
-const fetchEpisodes = async (seasonId) => {
-  await podcastsStore.fetchEpisodesBySeason(seasonId);
-  episodes.value = podcastsStore.episodes;
-};
+const episodes = computed(() => pooncastStore.episodesBySeason(props.seasonId));
 
 watch(() => props.seasonId, async (newSeasonId) => {
   if (newSeasonId !== null) {
-    await fetchEpisodes(newSeasonId);
+    await pooncastStore.fetchEpisodesBySeason(newSeasonId);
   }
 });
 
 onMounted(async () => {
-  await fetchEpisodes(props.seasonId);
+  await pooncastStore.fetchEpisodesBySeason(props.seasonId);
 });
 </script>
 

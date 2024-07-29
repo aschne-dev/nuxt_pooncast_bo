@@ -7,8 +7,8 @@
 
 <script setup>
 import { ref } from 'vue';
-import SeasonManagement from '@/components/SeasonManagement';
-import PooncastManagement from '@/components/PooncastManagement';
+import SeasonManagement from '@/components/Pooncast/SeasonManagement';
+import PooncastManagement from '@/components/Pooncast/PooncastManagement';
 
 const selectedSeasonId = ref(null);
 

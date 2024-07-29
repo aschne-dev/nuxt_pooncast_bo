@@ -1,6 +1,7 @@
+// stores/PooncastSeason.js
 import { defineStore } from 'pinia';
 import { useFirestore } from 'vuefire';
-import { collection, addDoc, getDocs, query, orderBy, limit, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, limit, doc, setDoc, deleteDoc, where, writeBatch } from 'firebase/firestore';
 
 export const usePodcastsSeasonStore = defineStore('podcastsSeason', {
   state: () => ({
@@ -30,7 +31,6 @@ export const usePodcastsSeasonStore = defineStore('podcastsSeason', {
       const firestore = useFirestore();
 
       try {
-        // Get the last season ID and increment it
         const lastSeasonSnapshot = await getDocs(query(collection(firestore, 'seasons'), orderBy('id', 'desc'), limit(1)));
         let newId = 1;
         if (!lastSeasonSnapshot.empty) {
@@ -76,8 +76,18 @@ export const usePodcastsSeasonStore = defineStore('podcastsSeason', {
       const firestore = useFirestore();
 
       try {
+        // Supprimer les épisodes associés
+        const batch = writeBatch(firestore);
+        const episodesSnapshot = await getDocs(query(collection(firestore, 'podcasts'), where('saison', '==', seasonId)));
+        episodesSnapshot.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+        await batch.commit();
+
+        // Supprimer la saison
         const seasonRef = doc(firestore, 'seasons', String(seasonId));
         await deleteDoc(seasonRef);
+
         this.seasons = this.seasons.filter(season => season.id !== seasonId);
         this.loading = false;
       } catch (error) {
@@ -86,5 +96,10 @@ export const usePodcastsSeasonStore = defineStore('podcastsSeason', {
         this.loading = false;
       }
     },
+    async fetchEpisodeCountBySeason(seasonId) {
+      const firestore = useFirestore();
+      const episodesSnapshot = await getDocs(query(collection(firestore, 'podcasts'), where('saison', '==', seasonId)));
+      return episodesSnapshot.size;
+    }
   },
 });
