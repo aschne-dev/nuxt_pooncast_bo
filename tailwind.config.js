@@ -12,6 +12,7 @@ export default {
     fontFamily: {
       fraunces: ['Fraunces'],
       syne: ['Syne'],
+      nunito: ['Nunito'],
     }
   },
   plugins: [],

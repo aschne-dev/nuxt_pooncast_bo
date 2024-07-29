@@ -1,10 +1,6 @@
 <template>
-  <div>
-    <ul>
-      <li v-for="episode in episodes" :key="episode.id">
-        <Pooncast :pooncastId="episode.id" />
-      </li>
-    </ul>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">    
+    <Pooncast v-for="pooncast in episodes" :key="pooncast.id" :pooncastId="pooncast.id" />
   </div>
 </template>
 

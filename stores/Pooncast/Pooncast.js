@@ -1,7 +1,7 @@
 // stores/Pooncast.js
 import { defineStore } from 'pinia';
 import { useFirestore } from 'vuefire';
-import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
+import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
 
@@ -32,11 +32,16 @@ export const usePooncastStore = defineStore('Pooncast', {
           imageUrl = await getDownloadURL(snapshot.ref);
         }
 
+        // Calculate the next episode number for the given season
+        const episodesInSeason = this.pooncasts.filter(p => p.saison === pooncast.saison);
+        const nextEpisodeNumber = episodesInSeason.length > 0 ? Math.max(...episodesInSeason.map(e => e.episodeNumber)) + 1 : 1;
+
         const pooncastData = {
           ...pooncast,
           visuel: imageUrl,
           createdAt: new Date(),
           userId: user.uid,
+          episodeNumber: nextEpisodeNumber,
         };
 
         const docRef = await addDoc(collection(firestore, 'pooncasts'), pooncastData);
@@ -67,7 +72,9 @@ export const usePooncastStore = defineStore('Pooncast', {
   },
   getters: {
     episodesBySeason: (state) => {
-      return (season) => state.pooncasts.filter(pooncast => pooncast.saison === season);
+      return (season) => state.pooncasts
+        .filter(pooncast => pooncast.saison === season)
+        .sort((a, b) => a.episodeNumber - b.episodeNumber);
     },
     pooncastById: (state) => {
       return (id) => state.pooncasts.find(pooncast => pooncast.id === id);

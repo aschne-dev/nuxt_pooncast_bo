@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col">
     <div><SeasonManagement @seasonSelected="handleSeasonSelected" /></div>
-    <div class="bg-red-500"><PooncastManagement :seasonId="selectedSeasonId" /></div>
+    <div><PooncastManagement :seasonId="selectedSeasonId" /></div>
   </div>
 </template>
 
