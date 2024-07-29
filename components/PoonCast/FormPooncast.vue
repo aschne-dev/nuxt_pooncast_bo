@@ -24,13 +24,13 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { usePooncastStore } from '@/stores/Pooncast';
+import { usePooncastStore } from '~/stores/Pooncast/Pooncast';
 
 const props = defineProps({
   seasonId: Number
 });
 
-const emit = defineEmits(['podcastAdded']);
+const emit = defineEmits(['pooncastAdded']);
 
 const titre = ref('');
 const description = ref('');
@@ -55,23 +55,23 @@ const handleSubmit = async () => {
     return;
   }
 
-  const podcast = {
+  const pooncast = {
     saison: props.seasonId,
     titre: titre.value,
     description: description.value,
     fluxRss: fluxRss.value,
   };
 
-  await pooncastStore.addPodcast(podcast, visuel.value);
+  await pooncastStore.addpooncast(pooncast, visuel.value);
 
   if (!pooncastStore.error) {
     titre.value = '';
     description.value = '';
     fluxRss.value = '';
     visuel.value = null;
-    emit('podcastAdded');
+    emit('pooncastAdded');
   } else {
-    error.value = 'Erreur lors de l\'ajout du podcast';
+    error.value = 'Erreur lors de l\'ajout du pooncast';
   }
 };
 

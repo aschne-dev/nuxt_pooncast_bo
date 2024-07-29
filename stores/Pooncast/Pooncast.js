@@ -7,12 +7,12 @@ import { getAuth } from 'firebase/auth';
 
 export const usePooncastStore = defineStore('Pooncast', {
   state: () => ({
-    episodes: [],
+    pooncasts: [],
     loading: false,
     error: null,
   }),
   actions: {
-    async addPodcast(podcast, imageFile) {
+    async addpooncast(pooncast, imageFile) {
       this.loading = true;
       this.error = null;
       const firestore = useFirestore();
@@ -27,50 +27,53 @@ export const usePooncastStore = defineStore('Pooncast', {
 
         let imageUrl = '';
         if (imageFile) {
-          const imageRef = storageRef(storage, `podcast_images/${imageFile.name}`);
+          const imageRef = storageRef(storage, `pooncast_images/${imageFile.name}`);
           const snapshot = await uploadBytes(imageRef, imageFile);
           imageUrl = await getDownloadURL(snapshot.ref);
         }
 
-        const podcastData = {
-          ...podcast,
+        const pooncastData = {
+          ...pooncast,
           visuel: imageUrl,
           createdAt: new Date(),
           userId: user.uid,
         };
 
-        await addDoc(collection(firestore, 'podcasts'), podcastData);
-        this.episodes.push(podcastData);
+        const docRef = await addDoc(collection(firestore, 'pooncasts'), pooncastData);
+        pooncastData.id = docRef.id;
+        this.pooncasts.push(pooncastData);
         this.loading = false;
       } catch (error) {
-        console.error('Error adding podcast: ', error);
-        this.error = 'Error adding podcast';
+        console.error('Error adding pooncast: ', error);
+        this.error = 'Error adding pooncast';
         this.loading = false;
       }
     },
-    async fetchEpisodesBySeason(seasonId) {
+    async fetchpooncasts() {
       this.loading = true;
       this.error = null;
       const firestore = useFirestore();
 
       try {
-        const snapshot = await getDocs(query(collection(firestore, 'podcasts'), where('saison', '==', seasonId)));
-        this.episodes = snapshot.docs.map(doc => doc.data());
+        const snapshot = await getDocs(collection(firestore, 'pooncasts'));
+        this.pooncasts = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
         this.loading = false;
       } catch (error) {
-        console.error('Error fetching episodes: ', error);
-        this.error = 'Error fetching episodes';
+        console.error('Error fetching pooncasts: ', error);
+        this.error = 'Error fetching pooncasts';
         this.loading = false;
       }
     }
   },
   getters: {
-    episodesBySeason: (state) => (seasonId) => {
-      return state.episodes.filter(episode => episode.saison === seasonId);
+    episodesBySeason: (state) => {
+      return (season) => state.pooncasts.filter(pooncast => pooncast.saison === season);
     },
-
-    podcastById: (state) => {
-      return (id) => state.podcasts.find(podcast => podcast.id === id);
+    pooncastById: (state) => {
+      return (id) => state.pooncasts.find(pooncast => pooncast.id === id);
+    },
+    episodeCountBySeason: (state) => {
+      return (season) => state.pooncasts.filter(pooncast => pooncast.saison === season).length;
     }
-  }
+  },
 });
