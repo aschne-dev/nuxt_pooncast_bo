@@ -1,47 +1,52 @@
 <template>
-  <div class="border-r-2 border-r-tertiary px-2">
-    <ul>
-        <li v-for="season in seasons" :key="season.id" class="flex justify-between items-center text-secondary pt-2">
-         
-          <div class="w-3/4">
-            <span @click="selectSeason(season)" v-if="!isEditing(season)" class="ps-2 cursor-pointer"><span class="font-bold text-black">#{{ season.id }}</span> {{ season.title }}</span>
-            <input v-else v-model="editTitle" class="ps-2" />
+  <div>
+    <div class="container px-5 pt-3 bg-tertiary rounded shadow-lg">
 
-            <button v-if="isEditing(season)" @click="updateSeason(season.id)">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-              </svg>
-            </button> 
-          </div> 
+      <select v-model="selectedSeasonId" @change="handleSeasonChange" class="rounded my-2 text-xl px-2">
+        <option v-for="season in seasons" :key="season.id" :value="season.id">#{{ season.id }} {{ season.title }}</option>
+      </select>
 
+      <div class="border-t-primary border-t-2 my-5 w-3/4"></div>
 
-          <div class="w-1/4">
-            <button @click="editSeason(season)" v-if="!isEditing(season)">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-              </svg>
-            </button>
-
-            <button @click="confirmDeleteSeason(season.id)" v-if="!isEditing(season)">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ps-2 w-8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-              </svg>
-            </button>
-          </div>
-         
-        </li>
-    </ul>
-
-    <div class="mt-6 flex flex-col items-center size-full">
-      <div class="border-t-2 border-t-secondary mb-3 w-2/3"></div>
-      <form @submit.prevent="addNewSeason" class="flex flex-col size-full" >
-        <textarea v-model="newSeasonTitle" type="text" placeholder="titre" rows="2" class="mb-2 rounded" />
-        <button class="btn">Nouvelle saison</button>
+      <form @submit.prevent="addNewSeason" class="flex items-center pb-5">
+        <input v-model="newSeasonTitle" type="text" placeholder="Titre Nouvelle saison" size="30" class="rounded text-xl" />
+        <button class="ms-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+        </button>
       </form>
+
     </div>
 
-  </div>
+    <header v-if="selectedSeason" class="flex items-center justify-between px-5 py-6">
+      <div>
+        <h1 v-if="!isEditing(selectedSeason)" class="text-4xl"><span class="font-bold text-black">#{{ selectedSeason.id }}</span> {{ selectedSeason.title }}</h1>
+        <input v-else v-model="editTitle" class="text-4xl text-secondary" size="35" />
+      </div>
 
+      <div>
+        <button v-if="isEditing(selectedSeason)" @click="updateSeason(selectedSeason.id)">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mr-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+        </button> 
+
+        <button @click="editSeason(selectedSeason)" v-if="!isEditing(selectedSeason)">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+          </svg>
+        </button>
+
+        <button @click="confirmDeleteSeason(selectedSeason.id)" v-if="!isEditing(selectedSeason)">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 ms-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+  </div>
 </template>
 
 <script setup>
@@ -51,18 +56,23 @@ import { usePodcastsSeasonStore } from '@/stores/PooncastSeason';
 const newSeasonTitle = ref('');
 const editTitle = ref('');
 const editingSeasonId = ref(null);
+const selectedSeasonId = ref(null);
 const podcastsSeasonStore = usePodcastsSeasonStore();
 
 const emit = defineEmits(['seasonSelected']);
 
 onMounted(async () => {
   await podcastsSeasonStore.fetchSeasons();
+  selectedSeasonId.value = podcastsSeasonStore.seasons.length ? podcastsSeasonStore.seasons[podcastsSeasonStore.seasons.length - 1].id : null;
+  handleSeasonChange(); // Ensure we handle initial season selection
 });
 
 const addNewSeason = async () => {
   if (newSeasonTitle.value) {
     await podcastsSeasonStore.addSeason(newSeasonTitle.value);
     newSeasonTitle.value = '';
+    selectedSeasonId.value = podcastsSeasonStore.seasons[podcastsSeasonStore.seasons.length - 1].id;
+    handleSeasonChange();
   }
 };
 
@@ -85,14 +95,24 @@ const confirmDeleteSeason = (seasonId) => {
 
 const deleteSeason = async (seasonId) => {
   await podcastsSeasonStore.deleteSeason(seasonId);
+  selectedSeasonId.value = podcastsSeasonStore.seasons.length ? podcastsSeasonStore.seasons[podcastsSeasonStore.seasons.length - 1].id : null;
+  handleSeasonChange(); // Ensure we handle season change after deletion
 };
 
 const isEditing = (season) => editingSeasonId.value === season.id;
 
-const selectSeason = (season) => {
-  console.log('SEASON=' + season.id)
-  emit('seasonSelected', season.id);
+const handleSeasonChange = () => {
+  const season = podcastsSeasonStore.seasons.find(s => s.id === selectedSeasonId.value);
+  if (season) {
+    emit('seasonSelected', selectedSeasonId.value);
+    editTitle.value = season.title;
+    editingSeasonId.value = null;
+  } else {
+    selectedSeasonId.value = null;
+  }
 };
+
+const selectedSeason = computed(() => podcastsSeasonStore.seasons.find(season => season.id === selectedSeasonId.value));
 
 const seasons = computed(() => podcastsSeasonStore.seasons);
 </script>

@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { ref, watch, defineProps } from 'vue';
+import { ref, watch } from 'vue';
 import { usePooncastStore } from '@/stores/Pooncast';
 
 const props = defineProps({
