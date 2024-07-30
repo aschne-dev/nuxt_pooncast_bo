@@ -1,6 +1,6 @@
 <template>
     <div>
-        AVIS
+        Reco List
     </div>
 </template>
 
