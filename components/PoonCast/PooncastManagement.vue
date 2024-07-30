@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">    
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">    
     <Pooncast v-for="pooncast in episodes" :key="pooncast.id" :pooncastId="pooncast.id" />
   </div>
 </template>
