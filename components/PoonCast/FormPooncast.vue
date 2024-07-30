@@ -62,7 +62,7 @@ const handleSubmit = async () => {
     fluxRss: fluxRss.value,
   };
 
-  await pooncastStore.addpooncast(pooncast, visuel.value);
+  await pooncastStore.addPooncast(pooncast, visuel.value);
 
   if (!pooncastStore.error) {
     titre.value = '';

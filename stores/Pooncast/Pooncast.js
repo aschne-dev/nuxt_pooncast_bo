@@ -1,7 +1,7 @@
 // stores/Pooncast.js
 import { defineStore } from 'pinia';
 import { useFirestore } from 'vuefire';
-import { collection, addDoc, getDocs, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, updateDoc, doc } from 'firebase/firestore';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
 
@@ -90,6 +90,43 @@ export const usePooncastStore = defineStore('Pooncast', {
       } catch (error) {
         console.error('Error deleting pooncast: ', error);
         this.error = 'Error deleting pooncast';
+      }
+    },
+    async updatePooncast(pooncastId, updatedData, newImageFile) {
+      this.loading = true;
+      this.error = null;
+      const firestore = useFirestore();
+      const storage = getStorage();
+
+      try {
+        const pooncastRef = doc(firestore, 'pooncasts', pooncastId);
+        const pooncast = this.pooncasts.find(p => p.id === pooncastId);
+
+        if (newImageFile) {
+          // Delete the old image from Firebase Storage
+          if (pooncast.visuel) {
+            const oldImageRef = storageRef(storage, pooncast.visuel);
+            await deleteObject(oldImageRef);
+          }
+
+          // Upload the new image
+          const newImageRef = storageRef(storage, `pooncast_images/${newImageFile.name}`);
+          const snapshot = await uploadBytes(newImageRef, newImageFile);
+          updatedData.visuel = await getDownloadURL(snapshot.ref);
+        }
+
+        // Update Firestore document
+        await updateDoc(pooncastRef, updatedData);
+
+        // Update local store
+        const index = this.pooncasts.findIndex(p => p.id === pooncastId);
+        this.pooncasts[index] = { ...this.pooncasts[index], ...updatedData };
+
+        this.loading = false;
+      } catch (error) {
+        console.error('Error updating pooncast: ', error);
+        this.error = 'Error updating pooncast';
+        this.loading = false;
       }
     },
   },
