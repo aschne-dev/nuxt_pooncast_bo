@@ -19,7 +19,7 @@ const handleSeasonSelected = (seasonId) => {
 };
 
 onMounted(async () => {
-  await pooncastStore.fetchpooncasts();
+  await pooncastStore.fetchPooncasts();
 });
 </script>
 

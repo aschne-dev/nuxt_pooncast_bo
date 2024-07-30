@@ -17,7 +17,7 @@ const pooncastStore = usePooncastStore();
 const episodes = computed(() => pooncastStore.episodesBySeason(props.seasonId));
 
 onMounted(async () => {
-  await pooncastStore.fetchpooncasts();
+  await pooncastStore.fetchPooncasts();
 });
 </script>
 

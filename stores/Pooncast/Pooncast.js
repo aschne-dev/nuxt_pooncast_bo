@@ -1,8 +1,8 @@
 // stores/Pooncast.js
 import { defineStore } from 'pinia';
 import { useFirestore } from 'vuefire';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc, getDocs, deleteDoc } from 'firebase/firestore';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
 
 export const usePooncastStore = defineStore('Pooncast', {
@@ -12,7 +12,7 @@ export const usePooncastStore = defineStore('Pooncast', {
     error: null,
   }),
   actions: {
-    async addpooncast(pooncast, imageFile) {
+    async addPooncast(pooncast, imageFile) {
       this.loading = true;
       this.error = null;
       const firestore = useFirestore();
@@ -32,7 +32,6 @@ export const usePooncastStore = defineStore('Pooncast', {
           imageUrl = await getDownloadURL(snapshot.ref);
         }
 
-        // Calculate the next episode number for the given season
         const episodesInSeason = this.pooncasts.filter(p => p.saison === pooncast.saison);
         const nextEpisodeNumber = episodesInSeason.length > 0 ? Math.max(...episodesInSeason.map(e => e.episodeNumber)) + 1 : 1;
 
@@ -54,7 +53,7 @@ export const usePooncastStore = defineStore('Pooncast', {
         this.loading = false;
       }
     },
-    async fetchpooncasts() {
+    async fetchPooncasts() {
       this.loading = true;
       this.error = null;
       const firestore = useFirestore();
@@ -68,7 +67,31 @@ export const usePooncastStore = defineStore('Pooncast', {
         this.error = 'Error fetching pooncasts';
         this.loading = false;
       }
-    }
+    },
+    async deletePooncast(pooncastId) {
+      const firestore = useFirestore();
+      const storage = getStorage();
+
+      try {
+        // Delete the pooncast from Firestore
+        await deleteDoc(doc(firestore, 'pooncasts', pooncastId));
+
+        // Find the pooncast in the store
+        const pooncast = this.pooncasts.find(p => p.id === pooncastId);
+
+        // Delete the image from Firebase Storage
+        if (pooncast.visuel) {
+          const imageRef = storageRef(storage, pooncast.visuel);
+          await deleteObject(imageRef);
+        }
+
+        // Remove the pooncast from the store
+        this.pooncasts = this.pooncasts.filter(p => p.id !== pooncastId);
+      } catch (error) {
+        console.error('Error deleting pooncast: ', error);
+        this.error = 'Error deleting pooncast';
+      }
+    },
   },
   getters: {
     episodesBySeason: (state) => {
