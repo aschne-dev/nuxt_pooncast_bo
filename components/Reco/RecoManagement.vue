@@ -1,17 +1,22 @@
 <template>
     <div>
         <div class="text-center mt-2">
-        <h1>Liste des recommandations</h1>
-        <button class="btn mt-3" @click="toggleAddReco">
-            {{ showAddReco ? 'Annuler' : 'Ajouter une recommandation' }}
-        </button>
+            <h1>Liste des recommandations</h1>
         </div>
+
+        <!-- PREVIEW -->
+        <div class="mx-5 my-5 bg-primary shadow">
+            PREVIEW
+        </div>
+
         <!-- ADD -->
-        <transition name="collapse">
-        <div v-if="showAddReco">
-            <AddReco @recommendationAdded="handleRecommendationAdded"/>
+        <div class="text-center">
+            <button class="btn mt-3" @click="toggleAddReco">
+            {{ showAddReco ? 'Annuler' : 'Ajouter une recommandation' }}
+            </button>
+
+            <AddReco  v-if="showAddReco" @recommendationAdded="handleRecommendationAdded"/>
         </div>
-        </transition>
         
         <!-- LIST -->
         <div v-for="recommendation in recommendations" :key="recommendation.id">
@@ -21,7 +26,8 @@
 </template>
   
 <script setup>
-import { ref } from 'vue';
+import { VueperSlides, VueperSlide } from 'vueperslides'
+import 'vueperslides/dist/vueperslides.css'
 import { useRecommendationsStore } from '@/stores/Reco/Recommendation';
 import RecoDetail from './RecoDetail.vue';
 import AddReco from './AddReco.vue';
@@ -44,13 +50,5 @@ const handleRecommendationAdded = () => {
 <style scoped>
 /* Ajoutez vos styles ici */
 
-/* Transition pour l'effet collapse */
-.collapse-enter-active, .collapse-leave-active {
-transition: max-height 0.5s ease;
-}
-.collapse-enter, .collapse-leave-to {
-max-height: 0;
-overflow: hidden;
-}
 </style>
   

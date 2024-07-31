@@ -36,31 +36,31 @@
       </div>
 
       <!-- NOM -->
-      <div class="flex gap-3 items-center">
+      <div class="flex gap-3 items-center justify-between">
         <p class="font-syne uppercase font-bold text-xl text-secondary">Nom</p>
         <p v-if="!isUpdating">{{ recommendation.name }}</p>
-        <input v-else type="text" id="name" v-model="form.name" required class="w-full" />
+        <input v-else type="text" id="name" v-model="form.name" required class="w-3/4" />
       </div>
 
       <!-- PROFESSION -->
-      <div class="flex gap-3 items-center">
+      <div class="flex gap-3 items-center justify-between">
         <p class="font-syne uppercase font-bold text-xl text-secondary">Profession</p>
         <p v-if="!isUpdating">{{ recommendation.profession }}</p>
-        <input v-else type="text" id="profession" v-model="form.profession" required class="w-full " />
+        <input v-else type="text" id="profession" v-model="form.profession" required class="w-3/4 " />
       </div>
 
       <!-- NUMÉRO DE DÉPARTEMENT -->
-      <div class="flex gap-3 items-center">
+      <div class="flex gap-3 items-center justify-between">
         <p class="font-syne uppercase font-bold text-xl text-secondary">Département</p>
         <p v-if="!isUpdating">{{ recommendation.departmentNumber }}</p>
-        <input v-else type="number" id="departmentNumber" v-model="form.departmentNumber" required class="w-full" />
+        <input v-else type="number" id="departmentNumber" v-model="form.departmentNumber" required class="w-3/4" />
       </div>
 
       <!-- RECOMMANDATION -->
       <div class="flex gap-3 items-center">
         <p class="font-syne uppercase font-bold text-xl text-secondary">Recommandation</p>
         <p v-if="!isUpdating">{{ recommendation.recommendation }}</p>
-        <textarea v-else id="recommendation" v-model="form.recommendation" required rows="4" class="w-full"></textarea>
+        <textarea v-else id="recommendation" v-model="form.recommendation" required rows="4" class="w-3/4"></textarea>
       </div>
     </div>
   </div>
@@ -69,7 +69,6 @@
 <script setup>
 import { ref } from 'vue'
 import { useRecommendationsStore } from '@/stores/Reco/Recommendation'
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
 
 const props = defineProps({
   recommendation: Object
@@ -106,23 +105,14 @@ const updateReco = async () => {
   isSubmitting.value = true
 
   try {
-    let avatarUrl = props.recommendation.avatar
-
-    if (form.value.avatar) {
-      const storage = getStorage()
-      const avatarRef = storageRef(storage, `avatars/${form.value.avatar.name}`)
-      const snapshot = await uploadBytes(avatarRef, form.value.avatar)
-      avatarUrl = await getDownloadURL(snapshot.ref)
-    }
-
     await recommendationsStore.updateRecommendation(props.recommendation.id, {
       name: form.value.name,
       profession: form.value.profession,
       departmentNumber: form.value.departmentNumber,
       recommendation: form.value.recommendation,
-      avatar: avatarUrl,
+      avatar: props.recommendation.avatar,
       oldAvatar: form.value.avatar ? props.recommendation.avatar : null
-    })
+    }, form.value.avatar)
 
     isUpdating.value = false
   } catch (error) {

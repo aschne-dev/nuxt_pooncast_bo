@@ -19,7 +19,8 @@
     "nuxt": "^3.12.4",
     "nuxt-vuefire": "^1.0.3",
     "pinia": "^2.1.7",
-    "vue": "latest"
+    "vue": "latest",
+    "vueperslides": "^3.5.1"
   },
   "overrides": {
     "vue": "latest"

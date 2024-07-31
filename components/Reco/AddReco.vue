@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-lg mx-auto mt-10 p-5 shadow rounded bg-primary font-syne">
+  <div class="max-w-lg mx-auto mt-10 p-5 shadow rounded bg-primary font-syne text-start">
     <form @submit.prevent="handleSubmit">
       <!-- Nom -->
       <div class="mb-4">
@@ -78,7 +78,6 @@
 <script setup>
 import { ref } from 'vue'
 import { useRecommendationsStore } from '@/stores/Reco/Recommendation'
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
 
 const recommendationsStore = useRecommendationsStore()
 
@@ -91,7 +90,6 @@ const form = ref({
 })
 
 const isSubmitting = ref(false)
-const emit = defineEmits(['recommendationAdded'])
 
 const handleFileChange = (event) => {
   const file = event.target.files[0]
@@ -100,38 +98,29 @@ const handleFileChange = (event) => {
   }
 }
 
+const emit = defineEmits(['recommendationAdded'])
+
 const handleSubmit = async () => {
   if (form.value.name && form.value.profession && form.value.departmentNumber && form.value.avatar && form.value.recommendation) {
     isSubmitting.value = true
+    await recommendationsStore.addRecommendation({
+      name: form.value.name,
+      profession: form.value.profession,
+      departmentNumber: form.value.departmentNumber,
+      recommendation: form.value.recommendation
+    }, form.value.avatar)
 
-    try {
-      const storage = getStorage()
-      const avatarRef = storageRef(storage, `avatars/${form.value.avatar.name}`)
-      const snapshot = await uploadBytes(avatarRef, form.value.avatar)
-      const avatarUrl = await getDownloadURL(snapshot.ref)
+    // Reset form fields
+    form.value.name = ''
+    form.value.profession = ''
+    form.value.departmentNumber = ''
+    form.value.avatar = null
+    form.value.recommendation = ''
 
-      await recommendationsStore.addRecommendation({
-        name: form.value.name,
-        profession: form.value.profession,
-        departmentNumber: form.value.departmentNumber,
-        recommendation: form.value.recommendation,
-        avatar: avatarUrl
-      })
+    isSubmitting.value = false
 
-      // Reset form fields
-      form.value.name = ''
-      form.value.profession = ''
-      form.value.departmentNumber = ''
-      form.value.avatar = null
-      form.value.recommendation = ''
-
-      emit('recommendationAdded')
-      
-    } catch (error) {
-      console.error('Error uploading avatar:', error)
-    } finally {
-      isSubmitting.value = false
-    }
+    // Emettre l'événement recommendationAdded
+    emit('recommendationAdded')
   } else {
     alert('Veuillez remplir tous les champs et importer une image.')
   }
