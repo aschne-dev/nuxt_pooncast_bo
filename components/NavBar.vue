@@ -10,9 +10,9 @@
       </div>
     </div>
     
-    <ul class="text-center gap-4">
+    <ul class="gap-4 ps-6">
       <li><NuxtLink to="/" class="text-secondary">Pooncast</NuxtLink></li>
-      <li><NuxtLink to="/reco" class="text-secondary">Avis</NuxtLink></li>
+      <li><NuxtLink to="/reco" class="text-secondary">Recommandations</NuxtLink></li>
       <li><NuxtLink to="/blog" class="text-secondary">Blog</NuxtLink></li>
     </ul>
 

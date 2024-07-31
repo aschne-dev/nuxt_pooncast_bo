@@ -32,7 +32,8 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': { ssr: false },
-    '/login': { ssr: false }
+    '/login': { ssr: false },
+    '/reco' : { ssr: false }
   }
   
 })
