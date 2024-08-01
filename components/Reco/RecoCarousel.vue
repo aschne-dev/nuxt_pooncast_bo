@@ -19,7 +19,7 @@
                 
             </Carousel>
 
-            <div class="grid grid-cols-3 w-1/2 mt-5">
+            <div class="grid grid-cols-3 w-2/3 mt-5">
                 <div class="col-span-1">
                 </div>
 
@@ -32,7 +32,7 @@
                     </transition>
                 </div>
 
-                <div class="flex items-center justify-center">
+                <div class="flex items-center justify-start ps-6">
                     <button @click="slideTo(currentSlide + 1)" >
                         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="65" viewBox="0 0 64 65" fill="none" class="hover:fill-secondary transition-colors ease-in duration-150">
                         <circle cx="32" cy="32.5977" r="31.5" stroke="black"/>
@@ -40,9 +40,24 @@
                         </svg>
                     </button>
                 </div>
-            </div>        
+            </div>       
 
          </div>
+         <div class="mx-5 mt-5 pb-5 relative flex items-center justify-center">   
+            <img src="@/assets/img/reco_bg.svg" :alt="activeRecommendation.recommendation" />
+
+            <div class="absolute top-1/4 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="38" height="36" viewBox="0 0 38 36" fill="none">
+                <path d="M11.5031 0.4646L14.7371 3.6986C13.1691 6.4426 11.7971 9.1866 10.6211 11.9306C9.44511 14.5766 8.75911 17.1736 8.56311 19.7216L15.9131 21.3386V35.5976H0.0371094L0.0371094 25.3076C0.0371094 19.2316 1.21311 14.3316 3.56511 10.6076C6.01511 6.7856 8.66111 3.4046 11.5031 0.4646ZM33.5531 0.4646L36.7871 3.6986C35.2191 6.4426 33.8471 9.1866 32.6711 11.9306C31.4951 14.5766 30.8091 17.1736 30.6131 19.7216L37.9631 21.3386V35.5976H22.0871L22.0871 25.3076C22.0871 19.2316 23.2631 14.3316 25.6151 10.6076C28.0651 6.7856 30.7111 3.4046 33.5531 0.4646Z" fill="#030211"/>
+                </svg>
+            </div>
+
+            <div class="absolute top-1/3 flex items-center justify-center mx-10">                
+                <p class="text-center mt-10">{{ activeRecommendation.recommendation }}</p>
+            </div>            
+        </div>
+            
+  
     </div>
 </template>
 
@@ -52,7 +67,8 @@ import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import { useRecommendationsStore } from '@/stores/Reco/Recommendation'
 
 const recommendationsStore = useRecommendationsStore()
-const recommendations = computed(() => recommendationsStore.allRecommendations)
+const { recommendations } = storeToRefs(recommendationsStore);
+
 const activeRecommendation = ref('')
 
 const currentSlide = ref(0);

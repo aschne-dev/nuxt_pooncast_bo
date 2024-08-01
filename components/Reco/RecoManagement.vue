@@ -20,7 +20,7 @@
         
         <!-- LIST -->
         <div v-for="recommendation in recommendations" :key="recommendation.id">
-        <RecoDetail :recommendation="recommendation" class="my-5 mx-5" />
+            <RecoDetail :recommendation="recommendation" class="my-5 mx-5" />
         </div>
     </div>
 </template>
