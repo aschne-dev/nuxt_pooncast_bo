@@ -36,21 +36,21 @@
       </div>
 
       <!-- NOM -->
-      <div class="flex gap-3 items-center justify-between">
+      <div class="flex gap-3 items-center">
         <p class="font-syne uppercase font-bold text-xl text-secondary">Nom</p>
         <p v-if="!isUpdating">{{ recommendation.name }}</p>
         <input v-else type="text" id="name" v-model="form.name" required class="w-3/4" />
       </div>
 
       <!-- PROFESSION -->
-      <div class="flex gap-3 items-center justify-between">
+      <div class="flex gap-3 items-center">
         <p class="font-syne uppercase font-bold text-xl text-secondary">Profession</p>
         <p v-if="!isUpdating">{{ recommendation.profession }}</p>
         <input v-else type="text" id="profession" v-model="form.profession" required class="w-3/4 " />
       </div>
 
       <!-- NUMÉRO DE DÉPARTEMENT -->
-      <div class="flex gap-3 items-center justify-between">
+      <div class="flex gap-3 items-center">
         <p class="font-syne uppercase font-bold text-xl text-secondary">Département</p>
         <p v-if="!isUpdating">{{ recommendation.departmentNumber }}</p>
         <input v-else type="number" id="departmentNumber" v-model="form.departmentNumber" required class="w-3/4" />

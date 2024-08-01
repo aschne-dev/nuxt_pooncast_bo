@@ -20,7 +20,7 @@
     "nuxt-vuefire": "^1.0.3",
     "pinia": "^2.1.7",
     "vue": "latest",
-    "vueperslides": "^3.5.1"
+    "vue3-carousel": "^0.3.3"
   },
   "overrides": {
     "vue": "latest"

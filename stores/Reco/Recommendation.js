@@ -117,6 +117,7 @@ export const useRecommendationsStore = defineStore('recommendations', {
     }
   },
   getters: {
-    allRecommendations: (state) => state.recommendations
+    allRecommendations: (state) => state.recommendations,
+    getRecommendationById: (state) => (id) => state.recommendations.find(rec => rec.id === id)
   }
 })

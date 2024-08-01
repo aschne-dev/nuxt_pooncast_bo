@@ -6,7 +6,7 @@
 
         <!-- PREVIEW -->
         <div class="mx-5 my-5 bg-primary shadow">
-            PREVIEW
+            <RecoCarousel />
         </div>
 
         <!-- ADD -->
@@ -26,9 +26,8 @@
 </template>
   
 <script setup>
-import { VueperSlides, VueperSlide } from 'vueperslides'
-import 'vueperslides/dist/vueperslides.css'
 import { useRecommendationsStore } from '@/stores/Reco/Recommendation';
+import RecoCarousel from './RecoCarousel.vue';
 import RecoDetail from './RecoDetail.vue';
 import AddReco from './AddReco.vue';
 
