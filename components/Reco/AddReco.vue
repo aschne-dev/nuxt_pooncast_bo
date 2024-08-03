@@ -68,7 +68,7 @@
           class="btn"
           :disabled="isSubmitting"
         >
-          {{ isSubmitting ? 'Ajout en cours...' : 'Soumettre' }}
+          {{ isSubmitting ? 'Ajout en cours...' : 'Ajouter' }}
         </button>
       </div>
     </form>

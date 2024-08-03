@@ -53,7 +53,7 @@
             </div>
 
             <div class="absolute top-1/3 flex items-center justify-center mx-10">                
-                <p class="text-center mt-10">{{ activeRecommendation.recommendation }}</p>
+                <p class="text-center mt-10 px-10">{{ activeRecommendation.recommendation }}</p>
             </div>            
         </div>
             

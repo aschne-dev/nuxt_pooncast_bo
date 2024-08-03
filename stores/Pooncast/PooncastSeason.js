@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia';
 import { useFirestore } from 'vuefire';
 import { collection, getDocs, query, orderBy, limit, doc, setDoc, deleteDoc, where, writeBatch } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 export const usepooncastsSeasonStore = defineStore('pooncastsSeason', {
   state: () => ({
@@ -37,9 +38,17 @@ export const usepooncastsSeasonStore = defineStore('pooncastsSeason', {
           newId = lastSeasonSnapshot.docs[0].data().id + 1;
         }
 
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (!user) {
+          throw new Error('User is not authenticated');
+        }
+
         const newSeason = {
           id: newId,
           title: title,
+          createdAt: new Date(),
+          userId: user.uid,
         };
 
         await setDoc(doc(collection(firestore, 'seasons'), String(newId)), newSeason);

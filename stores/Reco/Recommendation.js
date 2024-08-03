@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { useFirestore } from 'vuefire'
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
+import { getAuth } from 'firebase/auth';
 
 export const useRecommendationsStore = defineStore('recommendations', {
   state: () => ({
@@ -41,8 +42,17 @@ export const useRecommendationsStore = defineStore('recommendations', {
           avatarUrl = await getDownloadURL(snapshot.ref)
         }
 
+        const auth = getAuth();
+
+        const user = auth.currentUser;
+        if (!user) {
+          throw new Error('User is not authenticated');
+        }
+
         const recommendationData = {
           ...recommendation,
+          createdAt: new Date(),
+          userId: user.uid,
           avatar: avatarUrl,
         }
 
