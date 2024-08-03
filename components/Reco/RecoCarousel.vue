@@ -83,6 +83,12 @@ const updateActiveRecommendation = () => {
     activeRecommendation.value = recommendations.value[currentIndex]
 }
 
+// Exposez la méthode pour qu'elle puisse être appelée depuis le parent
+defineExpose({
+    updateActiveRecommendation
+});
+
+
 onMounted(async () => {
     await recommendationsStore.fetchRecommendations()
     await nextTick()

@@ -6,7 +6,7 @@
 
         <!-- PREVIEW -->
         <div class="mx-5 my-5 bg-primary shadow">
-            <RecoCarousel />
+            <RecoCarousel ref="recoCarousel"/>
         </div>
 
         <!-- ADD -->
@@ -20,7 +20,7 @@
         
         <!-- LIST -->
         <div v-for="recommendation in recommendations" :key="recommendation.id">
-            <RecoDetail :recommendation="recommendation" class="my-5 mx-5" />
+            <RecoDetail :recommendation="recommendation" class="my-5 mx-5" @recommendationUpdated="handleRecommendationUpdated"/>
         </div>
     </div>
 </template>
@@ -35,6 +35,7 @@ const recommendationsStore = useRecommendationsStore();
 const { recommendations } = storeToRefs(recommendationsStore);
 
 const showAddReco = ref(false);
+const recoCarousel = ref(null);
 
 const toggleAddReco = () => {
     showAddReco.value = !showAddReco.value;
@@ -43,6 +44,13 @@ const toggleAddReco = () => {
 const handleRecommendationAdded = () => {
     showAddReco.value = false
 }
+
+const handleRecommendationUpdated = () => {
+    if (recoCarousel.value) {
+        recoCarousel.value.updateActiveRecommendation();
+    }
+};
+
 
 </script>
 

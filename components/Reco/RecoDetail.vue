@@ -77,6 +77,7 @@ const props = defineProps({
 const recommendationsStore = useRecommendationsStore()
 const isUpdating = ref(false)
 const isSubmitting = ref(false)
+const emit = defineEmits(['recommendationUpdated'])
 
 const form = ref({
   name: props.recommendation.name,
@@ -115,6 +116,7 @@ const updateReco = async () => {
     }, form.value.avatar)
 
     isUpdating.value = false
+    emit('recommendationUpdated')
   } catch (error) {
     console.error('Error updating recommendation:', error)
   } finally {
