@@ -13,6 +13,7 @@
     <ul class="gap-4 ps-6">
       <li><NuxtLink to="/" class="text-secondary">Pooncast</NuxtLink></li>
       <li><NuxtLink to="/reco" class="text-secondary">Recommandations</NuxtLink></li>
+      <li><NuxtLink to="/faq" class="text-secondary">FAQ</NuxtLink></li>
       <li><NuxtLink to="/blog" class="text-secondary">Blog</NuxtLink></li>
     </ul>
 
