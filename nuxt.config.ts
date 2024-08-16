@@ -9,6 +9,16 @@ export default defineNuxtConfig({
       title: 'Le PoonCast | Admin',
     },
   },
+  nitro: {
+    firebase: {
+      gen: 2,
+      httpsOptions: {
+        region: 'europe-west1'
+      },
+      serverFunctionName: "server_bo"
+    }
+  },
+
   modules: [
     "@nuxtjs/tailwindcss", 
     "@pinia/nuxt",

@@ -1,0 +1,14 @@
+{
+  "hosting": {
+    "public": ".output/public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "site": "lepooncast-aec97",
+    "cleanUrls": true,
+    "rewrites": [{ "source": "**", "function": "server_bo" }]
+  },
+  "functions": { "source": ".output/server" }  
+}
