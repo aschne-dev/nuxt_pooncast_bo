@@ -15,7 +15,7 @@
       <li><NuxtLink to="/participations" class="text-secondary">Participations</NuxtLink></li>
       <li><NuxtLink to="/reco" class="text-secondary">Recommandations</NuxtLink></li>
       <li><NuxtLink to="/faq" class="text-secondary">FAQ</NuxtLink></li>
-      <li><NuxtLink to="/blog" class="text-secondary">Blog</NuxtLink></li>
+      <li><NuxtLink to="/blog" class="text-secondary">PoonBlog</NuxtLink></li>
     </ul>
 
   </nav>
