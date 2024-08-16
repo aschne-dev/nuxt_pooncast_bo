@@ -1,6 +1,6 @@
 <template>
     <div>
-        BLOG
+        <BlogManagement />
     </div>
 </template>
 

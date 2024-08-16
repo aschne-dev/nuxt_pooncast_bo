@@ -1,4 +1,4 @@
-import { collection, getDocs, query, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, doc, updateDoc, deleteDoc, increment } from 'firebase/firestore';
 import { getStorage, ref as storageRef, deleteObject } from 'firebase/storage';
 
 
@@ -128,6 +128,12 @@ export const useParticipationsStore = defineStore({
                 // Delete the document from Firestore
                 const docRef = doc(firestore, 'participations', participation.docid);
                 await deleteDoc(docRef);
+
+                // Update the counter in Firestore
+                const counterDocRef = doc(firestore, 'ParticipationsCounters', 'participationCounter');
+                await updateDoc(counterDocRef, {
+                    currentId: increment(-1) // Decrement by 1
+                });
 
                 // Remove the participation from local state
                 this.participations = this.participations.filter(p => p.docid !== docid);
