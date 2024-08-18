@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   app: {
     head: {
-      title: 'Le PoonCast | Admin',
+      title: 'Admin Pooncast',
     },
   },
   nitro: {
