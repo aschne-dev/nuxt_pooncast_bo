@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-tertiary flex flex-col w-96 mx-auto p-4 relative">
+  <div class="bg-primary flex flex-col w-96 mx-auto p-4 relative">
     <div class="absolute flex items-center gap-2 z-10">
       <button v-if="!isUpdating" class="bg-gray-400 px-3 py-3 rounded-full opacity-80 hover:bg-secondary" @click="startUpdating">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
