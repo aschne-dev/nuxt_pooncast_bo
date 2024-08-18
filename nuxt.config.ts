@@ -19,12 +19,9 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: [
-    "@nuxtjs/tailwindcss", 
-    "@pinia/nuxt",
-    "nuxt-vuefire"
-  ],
+  modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt", "nuxt-vuefire"],
 
+  // Vuefire
   vuefire: {
     auth: {
       enabled: true,
@@ -44,7 +41,8 @@ export default defineNuxtConfig({
     '/': { ssr: false },
     '/login': { ssr: false },
     '/reco' : { ssr: false },
-    '/faq' : { ssr: false }
+    '/faq' : { ssr: false },
+    '/blog' : { ssr: false }
   }
   
 })

@@ -1,10 +1,11 @@
 <template>
-  <div class="max-w-lg mx-auto mt-10 p-5 shadow rounded bg-primary font-syne text-start">
+  <div class="mt-10 p-5 shadow rounded bg-primary font-syne text-start"
+  :class="{ 'mx-10': !props.blog }">
     <form @submit.prevent="handleSubmit">
 
        <!-- TITRE -->
-       <div class="mb-4">
-        <label for="title" class="block mb-1 font-bold text-lg">Question</label>
+       <div class="mb-4 mt-5">
+        <label for="title" class="block mb-1 font-bold text-lg">Titre</label>
         <textarea
           type="text"
           id="title"
@@ -57,13 +58,15 @@
         />
 
         <label :for="'chapter' + (index + 1)" class="block mb-1 font-bold">Description</label>
-        <textarea
+        <!-- <textarea
           :id="'chapter' + (index + 1)"
           v-model="chapter.text"
           rows="15"
           required
           class="w-full p-2 border border-gray-300 rounded"
-        />
+        />  -->
+
+        <QuillEditor :id="'chapter' + (index + 1)" v-model:content="chapter.text" contentType="html" theme="snow" />
       </div>
 
       
@@ -73,10 +76,14 @@
 
        <!-- Submit Button -->
        <div class="text-center mt-10 w-full">
-        <button
+        <button v-if="!props.blog"
           type="submit"
-          class="btn w-full"
+          class="btn w-full bg-green-600"
         >{{ loading ? 'Ajout en cours...' : "Ajouter l'article" }}</button>
+        <button v-else
+          type="submit"
+          class="btn w-full bg-green-600"
+        >{{ loading ? 'Édition en cours...' : "Valider les modifications" }}</button>
       </div>
       <div v-if="error" class="text-red-500 mt-2">{{ error }}</div>
 
@@ -85,16 +92,25 @@
 </template>
 
 <script setup>
+import { QuillEditor } from '@vueup/vue-quill';
+import "@vueup/vue-quill/dist/vue-quill.snow.css"
+
 import { useBlogStore } from '@/stores/Blog/blog';
+
+const props = defineProps({
+  blog: Object
+});
 
 const blogStore = useBlogStore();
 const { loading } = storeToRefs(blogStore);
+const emit = defineEmits(['blogAdded'])
 
 const form = ref({
-  title: '',
-  intro: '',
-  chapters: [{name:'', text: ''}]
-})
+  title: props.blog ? props.blog.title : '',
+  intro: props.blog ? props.blog.intro : '',
+  chapters: props.blog ? props.blog.chapters : [{name:'', text: ''}]
+});
+
 const error = ref(null);
 
 
@@ -132,17 +148,33 @@ const deleteChapter = (index) => {
   form.value.chapters.splice(index, 1);
 };
 
+
 // SUBMIT
 const handleSubmit = async () => {
   console.log("handle submit");
+
+  // Modifier le texte des chapitres pour ajouter les classes aux balises <ul> et <ol>
+    form.value.chapters.forEach((chapter) => {
+    chapter.text = chapter.text
+      .replace(/<ul>/g, '<ul class="list-disc list-inside">')
+      .replace(/<ol>/g, '<ol class="list-decimal list-inside">');
+  });
 
   const blog = {
     title: form.value.title,
     intro: form.value.intro,
     chapters: form.value.chapters,
   };
+  
+  //console.log("chapters:" + form.value.chapters[0].text)
 
-  await blogStore.addBlog(blog, visuel.value);
+  if (props.blog) {
+    // Si un blog est en cours d'édition, appelez `editBlog`
+    await blogStore.editBlog(props.blog.id, blog, visuel.value);
+  } else {
+    // Sinon, ajoutez un nouveau blog
+    await blogStore.addBlog(blog, visuel.value);
+  }
 
   if (!blogStore.error) {
     form.value.title = '',
@@ -150,9 +182,12 @@ const handleSubmit = async () => {
     form.value.chapters = [{name:'', text: ''}];
     visuel.value = null;
     imagePreview.value = null;
+    blogStore.fetchBlogs();
+    emit('blogAdded')
   } else {
     error.value = "Erreur lors de l'ajout de l'article";
   }
 }
+
 
 </script>

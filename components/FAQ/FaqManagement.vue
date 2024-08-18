@@ -16,7 +16,7 @@
         <!-- PREVIEW -->
         <div class="bg-secondary mx-5 px-5 py-5 rounded-xl">
             <div v-for="faq in faqs" :key="faq.id" class="my-5 grid grid-cols-4">
-                <div class="mx-auto text-4xl col-span-1 flex items-center justify-center gap-5">
+                <div class="mx-auto text-2xl col-span-1 flex items-center justify-center gap-5">
                     <div class="text-center">#{{ faq.order }}</div>
                     <div>
                         <button class="hover:scale-125 border border-primary rounded-full p-2" @click="handleOrder('up', faq)">
