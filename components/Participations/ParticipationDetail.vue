@@ -9,7 +9,8 @@
       </div>
 
       <div class="text-start border border-black p-2 rounded-lg">
-        <p>{{ participation.description }}</p>
+        <p class="font-bold">{{ pooncastsSeasonStore.seasonNameById(participation.selectedSeason) }}</p>
+        <p class="mt-2">{{ participation.description }}</p>
       </div>
     </div>
 
@@ -52,7 +53,13 @@
 
 <script setup>
 import { useParticipationsStore } from '@/stores/Participations/participation';
+import { usepooncastsSeasonStore } from '~/stores/Pooncast/PooncastSeason';
+
+
 const participationsStore = useParticipationsStore();
+
+const pooncastsSeasonStore = usepooncastsSeasonStore();
+const { seasonNameById } = storeToRefs(pooncastsSeasonStore)
 
 const props = defineProps({
   participation: Object,

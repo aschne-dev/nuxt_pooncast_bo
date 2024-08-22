@@ -1,7 +1,7 @@
 // stores/PooncastSeason.js
 import { defineStore } from 'pinia';
 import { useFirestore } from 'vuefire';
-import { collection, getDocs, query, orderBy, limit, doc, setDoc, deleteDoc, where, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, doc, setDoc, deleteDoc, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 export const usepooncastsSeasonStore = defineStore('pooncastsSeason', {
@@ -10,6 +10,22 @@ export const usepooncastsSeasonStore = defineStore('pooncastsSeason', {
     loading: false,
     error: null,
   }),
+
+  getters: {
+    totalCount: (state) => {
+      return state.seasons.length;
+    },
+    
+    // Nouveau getter pour obtenir le nom d'une saison à partir de son ID
+    seasonNameById: (state) => {
+      return (id) => {
+        const season = state.seasons.find(season => season.id === id);
+        return season ? season.title : 'Autre';
+      };
+    }
+  },
+
+
   actions: {
     async fetchSeasons() {
       this.loading = true;
@@ -49,6 +65,7 @@ export const usepooncastsSeasonStore = defineStore('pooncastsSeason', {
           title: title,
           createdAt: new Date(),
           userId: user.uid,
+          participationFormVisible: false
         };
 
         await setDoc(doc(collection(firestore, 'seasons'), String(newId)), newSeason);
@@ -103,6 +120,28 @@ export const usepooncastsSeasonStore = defineStore('pooncastsSeason', {
         console.error('Error deleting season: ', error);
         this.error = 'Error deleting season';
         this.loading = false;
+      }
+    },
+
+    async toggleParticipationFormVisible(seasonId) {
+      const firestore = useFirestore();
+      const season = this.seasons.find(p => p.id === seasonId);
+
+      if (season) {
+          // Toggle the  value locally
+          season.participationFormVisible = !season.participationFormVisible;
+
+          try {
+              // Update the  field in Firestore
+              const docRef = doc(firestore, 'seasons', String(season.id));
+              await updateDoc(docRef, {
+                participationFormVisible: season.participationFormVisible
+              });
+          } catch (error) {
+              console.error('Error updating season:', error);
+          }
+      } else {
+          console.warn(`Season with id ${seasonId} not found.`);
       }
     },
   },
