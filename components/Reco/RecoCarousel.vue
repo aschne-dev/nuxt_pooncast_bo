@@ -6,7 +6,7 @@
             :transition="500"
             :wrap-around="true"
             v-model="currentSlide"
-            class="w-1/2 h-full"
+            class="w-1/2 h-full hidden"
             >
                 <Slide v-for="(recommendation, index) in recommendations" :key="recommendation.id">
                     <div class="flex items-center justify-center h-52 cursor-pointer" @click="slideTo(index)">
@@ -27,7 +27,7 @@
                     <transition name="fade">
                     <div :key="activeRecommendation.id" class="absolute w-full h-full">
                         <p class="font-syne font-medium capitalize text-3xl">{{ activeRecommendation.name }}</p>
-                        <p class="font-nunito">{{ activeRecommendation.profession }}, {{ activeRecommendation.departmentNumber }}</p>                    
+                        <p class="font-nunito">{{ activeRecommendation.profession }}</p>                    
                     </div>
                     </transition>
                 </div>

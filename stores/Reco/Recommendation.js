@@ -27,20 +27,19 @@ export const useRecommendationsStore = defineStore('recommendations', {
         this.loading = false
       }
     },
-    async addRecommendation(recommendation, avatarFile) {
+    async addRecommendation(recommendation) {
       this.loading = true
       this.error = null
       const firestore = useFirestore()
-      const storage = getStorage()
 
       try {
-        let avatarUrl = ''
+        /*let avatarUrl = ''
 
         if (avatarFile) {
           const avatarRef = storageRef(storage, `reco_avatar/${avatarFile.name}`)
           const snapshot = await uploadBytes(avatarRef, avatarFile)
           avatarUrl = await getDownloadURL(snapshot.ref)
-        }
+        }*/
 
         const auth = getAuth();
 
@@ -52,8 +51,7 @@ export const useRecommendationsStore = defineStore('recommendations', {
         const recommendationData = {
           ...recommendation,
           createdAt: new Date(),
-          userId: user.uid,
-          avatar: avatarUrl,
+          userId: user.uid
         }
 
         const docRef = await addDoc(collection(firestore, 'recommendations'), recommendationData)
@@ -65,33 +63,32 @@ export const useRecommendationsStore = defineStore('recommendations', {
         this.loading = false
       }
     },
-    async updateRecommendation(id, updatedRecommendation, avatarFile) {
+    async updateRecommendation(id, updatedRecommendation) {
       this.loading = true
       this.error = null
       const firestore = useFirestore()
-      const storage = getStorage()
 
       try {
-        let avatarUrl = updatedRecommendation.avatar
+        // let avatarUrl = updatedRecommendation.avatar
 
-        if (avatarFile) {
-          // Supprimer l'ancienne image si une nouvelle a été téléchargée
-          if (updatedRecommendation.oldAvatar) {
-            const oldAvatarRef = storageRef(storage, updatedRecommendation.oldAvatar)
-            await deleteObject(oldAvatarRef)
-          }
+        // if (avatarFile) {
+        //   // Supprimer l'ancienne image si une nouvelle a été téléchargée
+        //   if (updatedRecommendation.oldAvatar) {
+        //     const oldAvatarRef = storageRef(storage, updatedRecommendation.oldAvatar)
+        //     await deleteObject(oldAvatarRef)
+        //   }
 
-          const avatarRef = storageRef(storage, `reco_avatar/${avatarFile.name}`)
-          const snapshot = await uploadBytes(avatarRef, avatarFile)
-          avatarUrl = await getDownloadURL(snapshot.ref)
-        }
+        //   const avatarRef = storageRef(storage, `reco_avatar/${avatarFile.name}`)
+        //   const snapshot = await uploadBytes(avatarRef, avatarFile)
+        //   avatarUrl = await getDownloadURL(snapshot.ref)
+        // }
 
         const recommendationDoc = doc(firestore, 'recommendations', id)
-        await updateDoc(recommendationDoc, { ...updatedRecommendation, avatar: avatarUrl })
+        await updateDoc(recommendationDoc, updatedRecommendation)
 
         const index = this.recommendations.findIndex(r => r.id === id)
         if (index !== -1) {
-          this.recommendations[index] = { ...updatedRecommendation, avatar: avatarUrl, id }
+          this.recommendations[index] = { ...updatedRecommendation, id }
         }
 
         this.loading = false
@@ -105,16 +102,10 @@ export const useRecommendationsStore = defineStore('recommendations', {
       this.loading = true
       this.error = null
       const firestore = useFirestore()
-      const storage = getStorage()
 
       try {
         const recommendationDoc = doc(firestore, 'recommendations', id)
         const recommendation = this.recommendations.find(r => r.id === id)
-
-        if (recommendation.avatar) {
-          const avatarRef = storageRef(storage, recommendation.avatar)
-          await deleteObject(avatarRef)
-        }
 
         await deleteDoc(recommendationDoc)
         this.recommendations = this.recommendations.filter(r => r.id !== id)

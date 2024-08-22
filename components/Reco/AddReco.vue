@@ -26,7 +26,7 @@
       </div>
 
       <!-- Numéro de département -->
-      <div class="mb-4">
+      <!-- <div class="mb-4">
         <label for="departmentNumber" class="block mb-1 font-bold text-lg">Numéro de département</label>
         <input
           type="number"
@@ -35,10 +35,10 @@
           required
           class="w-full p-2 border border-gray-300 rounded"
         />
-      </div>
+      </div> -->
 
       <!-- Avatar -->
-      <div class="mb-4">
+      <!-- <div class="mb-4">
         <label for="avatar" class="block mb-1 font-bold text-lg">Avatar (image)</label>
         <input
           type="file"
@@ -47,7 +47,7 @@
           required
           class="w-full p-2 border border-gray-300 rounded"
         />
-      </div>
+      </div> -->
 
       <!-- Recommandation -->
       <div class="mb-4">
@@ -85,8 +85,6 @@ const form = ref({
   name: '',
   profession: '',
   departmentNumber: '',
-  avatar: null,
-  recommendation: ''
 })
 
 const isSubmitting = ref(false)
@@ -101,20 +99,17 @@ const handleFileChange = (event) => {
 const emit = defineEmits(['recommendationAdded'])
 
 const handleSubmit = async () => {
-  if (form.value.name && form.value.profession && form.value.departmentNumber && form.value.avatar && form.value.recommendation) {
+  if (form.value.name && form.value.profession  && form.value.recommendation) {
     isSubmitting.value = true
     await recommendationsStore.addRecommendation({
       name: form.value.name,
       profession: form.value.profession,
-      departmentNumber: form.value.departmentNumber,
       recommendation: form.value.recommendation
-    }, form.value.avatar)
+    })
 
     // Reset form fields
     form.value.name = ''
     form.value.profession = ''
-    form.value.departmentNumber = ''
-    form.value.avatar = null
     form.value.recommendation = ''
 
     isSubmitting.value = false
