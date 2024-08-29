@@ -10,8 +10,20 @@
       <label class="pt-3 text-secondary">Visuel:</label>
       <input type="file" @change="handleFileChange" />
 
-      <label class="pt-3 text-secondary">Flux RSS:</label>
-      <textarea v-model="fluxRss" placeholder="Flux RSS" rows="5" />
+      <label class="pt-3 text-secondary">Lien MP3:</label>
+      <textarea v-model="fluxRss" placeholder="Lien MP3 (lecture sur le site pour plus tard)" rows="2" />
+
+      <label class="pt-3 text-secondary">Spotify:</label>
+      <textarea v-model="spotify" placeholder="Lien Spotify" rows="2" />
+
+      <label class="pt-3 text-secondary">Apple:</label>
+      <textarea v-model="apple" placeholder="Lien Apple" rows="2" />
+
+      <label class="pt-3 text-secondary">Podcast Addict:</label>
+      <textarea v-model="podcastaddict" placeholder="Lien Podcast Addict" rows="2" />
+
+      <label class="pt-3 text-secondary">Amazon:</label>
+      <textarea v-model="amazon" placeholder="Lien Amazon" rows="2" />
 
       <button class="btn my-3 text-black font-bold uppercase" :disabled="loading">
         <span v-if="loading">Adding...</span>
@@ -23,7 +35,6 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
 import { usePooncastStore } from '~/stores/Pooncast/Pooncast';
 
 const props = defineProps({
@@ -35,6 +46,10 @@ const emit = defineEmits(['pooncastAdded']);
 const titre = ref('');
 const description = ref('');
 const fluxRss = ref('');
+const spotify = ref('');
+const apple = ref('');
+const podcastaddict = ref('');
+const amazon = ref('');
 const visuel = ref(null);
 
 const pooncastStore = usePooncastStore();
@@ -50,7 +65,7 @@ const handleFileChange = (event) => {
 const handleSubmit = async () => {
   error.value = null;
 
-  if (!titre.value || !description.value || !fluxRss.value || !visuel.value) {
+  if (!titre.value || !description.value || !fluxRss || !spotify.value || !apple.value || !podcastaddict.value || !amazon.value || !visuel.value) {
     error.value = 'Veuillez remplir tous les champs.';
     return;
   }
@@ -59,7 +74,13 @@ const handleSubmit = async () => {
     saison: props.seasonId,
     titre: titre.value,
     description: description.value,
-    fluxRss: fluxRss.value,
+    audio: {
+      fluxRss: fluxRss.value,
+      spotify: spotify.value,
+      apple: apple.value,
+      podcastaddict: podcastaddict.value,
+      amazon: amazon.value,
+    },        
   };
 
   await pooncastStore.addPooncast(pooncast, visuel.value);
@@ -67,7 +88,11 @@ const handleSubmit = async () => {
   if (!pooncastStore.error) {
     titre.value = '';
     description.value = '';
-    fluxRss.value = '';
+    fluxRss.value = '',
+    spotify.value = '';
+    apple.value = '';
+    podcastaddict.value = '';
+    amazon.value = '';
     visuel.value = null;
     emit('pooncastAdded');
   } else {

@@ -26,7 +26,7 @@
     <audio ref="audioPlayer" :src="fluxRss" @timeupdate="updateProgress" @loadedmetadata="setDuration" />
 
   </div> -->
-  <div class="border-black border-solid border rounded-lg px-5 py-2 font-syne font-bold w-full">
+  <div class="border-primary border-solid border rounded-lg px-5 py-2 font-syne font-bold w-full">
     <div class="flex items-center justify-center">
       <span @click="handleAudio" class="cursor-pointer hover:text-secondary transition-colors ease-in duration-150">Ecouter</span>
       <button v-if="!isPlaying" @click="handleAudio">
