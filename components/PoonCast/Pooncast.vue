@@ -65,13 +65,13 @@
         <textarea v-model="spotify" :placeholder="pooncast.audio.spotify" rows="3" />
 
         <label class="pt-3 text-primary">Apple:</label>
-        <textarea v-model="apple" :placeholder="pooncast.audio.apple" rows="3" />
-
-        <label class="pt-3 text-primary">Podcast Addict:</label>
-        <textarea v-model="podcastaddict" :placeholder="pooncast.audio.podcastaddict" rows="3" />
+        <textarea v-model="apple" :placeholder="pooncast.audio.apple" rows="3" />        
 
         <label class="pt-3 text-primary">Amazon:</label>
         <textarea v-model="amazon" :placeholder="pooncast.audio.amazon" rows="3" />
+
+        <label class="pt-3 text-primary">Podcast Addict:</label>
+        <textarea v-model="podcastaddict" :placeholder="pooncast.audio.podcastaddict" rows="3" />
       </div>
     </div> 
 

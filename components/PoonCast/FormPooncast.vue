@@ -17,13 +17,13 @@
       <textarea v-model="spotify" placeholder="Lien Spotify" rows="2" />
 
       <label class="pt-3 text-secondary">Apple:</label>
-      <textarea v-model="apple" placeholder="Lien Apple" rows="2" />
-
-      <label class="pt-3 text-secondary">Podcast Addict:</label>
-      <textarea v-model="podcastaddict" placeholder="Lien Podcast Addict" rows="2" />
+      <textarea v-model="apple" placeholder="Lien Apple" rows="2" />      
 
       <label class="pt-3 text-secondary">Amazon:</label>
       <textarea v-model="amazon" placeholder="Lien Amazon" rows="2" />
+
+      <label class="pt-3 text-secondary">Podcast Addict:</label>
+      <textarea v-model="podcastaddict" placeholder="Lien Podcast Addict" rows="2" />
 
       <button class="btn my-3 text-black font-bold uppercase" :disabled="loading">
         <span v-if="loading">Adding...</span>

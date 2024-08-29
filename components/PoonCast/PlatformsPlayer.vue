@@ -9,12 +9,13 @@
         <img src="@/assets/img/logo_applepodcast.svg" class="size-12" :alt="'Lien Apple Podcast du pooncast ' + pooncastTitle" />
       </NuxtLink>
 
-      <NuxtLink :to="pooncastAudio.podcastaddict" target="_blank" title="Podcast Addict">
-        <img src="@/assets/img/logo_podcastaddict.svg" class="size-12" :alt="'Lien Podcast Addict du pooncast ' + pooncastTitle" />
-      </NuxtLink>
 
       <NuxtLink :to="pooncastAudio.amazon" target="_blank" title="Amazon Music">
         <img src="@/assets/img/logo_amazon.svg" class="size-12" :alt="'Lien Amazon Music du pooncast ' + pooncastTitle" />
+      </NuxtLink>
+
+      <NuxtLink :to="pooncastAudio.podcastaddict" target="_blank" title="Podcast Addict">
+        <img src="@/assets/img/logo_podcastaddict.svg" class="size-12" :alt="'Lien Podcast Addict du pooncast ' + pooncastTitle" />
       </NuxtLink>
     </div>   
   </div>
