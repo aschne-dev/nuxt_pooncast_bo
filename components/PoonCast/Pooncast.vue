@@ -52,13 +52,16 @@
 
     
     <!-- AUDIO FILE -->
-    <div class="mt-10 mb-auto flex items-center justify-between w-full">
+    <div class="mt-5 mb-auto flex items-center justify-between w-full">
       <Player v-if="!isUpdating" :fluxRss="pooncast.audio.fluxRss" />
-      <textarea v-else v-model="fluxRss" :placeholder="pooncast.audio.fluxRss" rows="5" class="w-full" />
+      <div v-else class="w-full">
+        <label class="text-primary">Lien MP3:</label>
+        <textarea v-model="fluxRss" :placeholder="pooncast.audio.fluxRss" rows="5" class="w-full" />
+      </div>
     </div>
 
      <!-- PODCAST PLATFORMS LINKS  -->
-     <div class="mt-10 mb-auto flex items-center justify-between w-full">
+     <div class="mt-5 mb-auto flex items-center justify-between w-full">
       <PlatformsPlayer v-if="!isUpdating" :pooncastAudio="pooncast.audio" :pooncastTitle="pooncast.titre" />
       <div v-else class="flex flex-col w-full">
         <label class="pt-3 text-primary">Spotify:</label>
