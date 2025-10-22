@@ -83,6 +83,9 @@
 </template>
 
 <script setup>
+import { getStorage, ref as storageRef, deleteObject } from 'firebase/storage';
+import { useFirestore } from 'vuefire';
+import { deleteDoc, doc } from 'firebase/firestore';
 import { usePooncastStore } from '@/stores/Pooncast/Pooncast';
 import Player from '@/components/Pooncast/Player.vue';
 import PlatformsPlayer from './PlatformsPlayer.vue';

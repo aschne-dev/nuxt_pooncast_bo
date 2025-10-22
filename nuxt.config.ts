@@ -1,22 +1,20 @@
-import auth from "./middleware/auth.global";
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-04-03',
+  compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
   app: {
     head: {
-      title: 'Admin Pooncast',
+      title: "Admin Pooncast",
     },
   },
   nitro: {
     firebase: {
       gen: 2,
       httpsOptions: {
-        region: 'europe-west1'
+        region: "europe-west1",
       },
-      serverFunctionName: "server_bo"
-    }
+      serverFunctionName: "server_bo",
+    },
   },
 
   modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt", "nuxt-vuefire"],
@@ -25,24 +23,23 @@ export default defineNuxtConfig({
   vuefire: {
     auth: {
       enabled: true,
-      sessionCookie: false
+      sessionCookie: false,
     },
     config: {
-      apiKey: "AIzaSyApjYoK5Q86zJ2zHnX1Pcq3xkLenRns7bc",
-      authDomain: "lepooncast-aec97.firebaseapp.com",
-      projectId: "lepooncast-aec97",
-      storageBucket: "lepooncast-aec97.appspot.com",
-      messagingSenderId: "895460708454",
-      appId: "1:895460708454:web:4b79d540588b315d299da7"
+      apiKey: process.env.NUXT_FIREBASE_API_KEY,
+      authDomain: process.env.NUXT_FIREBASE_AUTH_DOMAIN,
+      projectId: process.env.NUXT_FIREBASE_PROJECT_ID,
+      storageBucket: process.env.NUXT_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: process.env.NUXT_FIREBASE_MESSAGING_SENDER_ID,
+      appId: process.env.NUXT_FIREBASE_APP_ID,
     },
   },
 
   routeRules: {
-    '/': { ssr: false },
-    '/login': { ssr: false },
-    '/reco' : { ssr: false },
-    '/faq' : { ssr: false },
-    '/blog' : { ssr: false }
-  }
-  
-})
+    "/": { ssr: false },
+    "/login": { ssr: false },
+    "/reco": { ssr: false },
+    "/faq": { ssr: false },
+    "/blog": { ssr: false },
+  },
+});
