@@ -2,6 +2,12 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
+  runtimeConfig: {
+    public: {
+      participationAudioUrlEndpoint:
+        process.env.NUXT_PUBLIC_PARTICIPATION_AUDIO_URL_ENDPOINT || "",
+    },
+  },
   app: {
     head: {
       title: "Admin Pooncast",

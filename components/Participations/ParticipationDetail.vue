@@ -16,8 +16,38 @@
 
     <div class="bg-tertiary grid grid-cols-1 rounded-b-lg p-2 relative">
       <div class="flex flex-col items-center">
-        <div class="">
-          <audio controls :src="participation.fileUrl"></audio> 
+        <div v-if="hasAudio" class="flex flex-col items-center gap-2">
+          <button
+            v-if="!audioUrl && !audioError"
+            class="btn disabled:cursor-wait disabled:opacity-60"
+            type="button"
+            :disabled="audioLoading"
+            @click="loadAudio()"
+          >
+            {{ audioLoading ? 'Chargement de l’audio…' : 'Écouter l’audio' }}
+          </button>
+          <template v-if="audioUrl">
+            <audio controls preload="none" :src="audioUrl" @error="handleAudioError"></audio>
+            <button
+              class="text-sm underline disabled:cursor-wait disabled:opacity-60"
+              type="button"
+              :disabled="audioLoading"
+              @click="loadAudio(true)"
+            >
+              {{ audioLoading ? 'Renouvellement…' : 'Renouveler le lien audio' }}
+            </button>
+          </template>
+          <div v-if="audioError" class="text-center" role="alert">
+            <p>{{ audioError }}</p>
+            <button
+              class="text-sm underline disabled:cursor-wait disabled:opacity-60"
+              type="button"
+              :disabled="audioLoading"
+              @click="loadAudio(true)"
+            >
+              {{ audioLoading ? 'Nouvelle tentative…' : 'Réessayer' }}
+            </button>
+          </div>
         </div>
 
         <div class="flex items-center justify-center">
@@ -64,6 +94,33 @@ const { seasonNameById } = storeToRefs(pooncastsSeasonStore)
 const props = defineProps({
   participation: Object,
 });
+
+const audioUrl = ref('');
+const audioLoading = ref(false);
+const audioError = ref('');
+const hasAudio = computed(() => Boolean(props.participation?.storagePath));
+const { fetchParticipationAudio, invalidateParticipationAudio } = useParticipationAudio();
+
+const loadAudio = async (force = false) => {
+  if (!props.participation?.docid || audioLoading.value) return;
+  audioLoading.value = true;
+  audioError.value = '';
+  try {
+    const audio = await fetchParticipationAudio(props.participation.docid, { force });
+    audioUrl.value = audio.url;
+  } catch (_error) {
+    audioUrl.value = '';
+    audioError.value = 'Impossible de charger l’audio. Veuillez réessayer.';
+  } finally {
+    audioLoading.value = false;
+  }
+};
+
+const handleAudioError = () => {
+  invalidateParticipationAudio(props.participation.docid);
+  audioUrl.value = '';
+  audioError.value = 'Le lien audio a expiré ou n’est plus disponible.';
+};
 
 const handleDelete = (docid) => {
   if (confirm('Êtes-vous sûr de vouloir supprimer cette participation ? Cette action est irréversible.')) {

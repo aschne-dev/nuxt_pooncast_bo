@@ -83,6 +83,7 @@ Le back office offre une interface complète pour :
      NUXT_FIREBASE_STORAGE_BUCKET=...        
      NUXT_FIREBASE_MESSAGING_SENDER_ID=...   
      NUXT_FIREBASE_APP_ID=...                
+     NUXT_PUBLIC_PARTICIPATION_AUDIO_URL_ENDPOINT=https://europe-west1-PROJECT_ID.cloudfunctions.net/getParticipationAudioUrl
      ```
      Remplacez chaque `...` par la valeur fournie dans la console Firebase.
    - Sécurisez le fichier de credentials (ex. `lepooncast-aec97-firebase-adminsdk-xxxxx.json`) et mettez à jour `GOOGLE_APPLICATION_CREDENTIALS` avec son chemin absolu.
@@ -110,6 +111,7 @@ npm run dev
 
 - L’interface est disponible sur `http://localhost:3000`.  
 - Connectez-vous avec un compte Firebase Auth autorisé et présent dans `bo_users` pour l’affichage du profil BO.
+- Les URLs audio privées sont obtenues à la demande auprès de la Function authentifiée ; elles restent uniquement en mémoire et ne sont jamais persistées côté BO.
 
 ### Vérifications rapides
 
