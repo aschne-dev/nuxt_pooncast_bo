@@ -41,7 +41,9 @@ import { useNewsletterStore } from '@/stores/Newsletter/newsletter';
 const newsletterStore = useNewsletterStore();
 const { newsletters, totalCount, optin, optinCount, optout, optoutCount, loading } = storeToRefs(newsletterStore);
 
-newsletterStore.fetchNewsletter();
+onMounted(() => {
+  newsletterStore.fetchNewsletter();
+});
 
 const filter = ref('all')
 
