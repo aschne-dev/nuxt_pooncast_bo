@@ -50,7 +50,9 @@ import { useParticipationsStore } from '@/stores/Participations/participation';
 const participationsStore = useParticipationsStore();
 const { processed, processedCount, newer, newerCount, totalCount, favs, favCount, loading } = storeToRefs(participationsStore);
 
-participationsStore.fetchParticipations();
+onMounted(() => {
+  participationsStore.fetchParticipations();
+});
 
 const filter = ref('all')
 </script>

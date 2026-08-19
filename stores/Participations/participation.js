@@ -121,9 +121,11 @@ export const useParticipationsStore = defineStore({
 
         if (participation) {
             try {
-                // Delete the file from Firebase Storage
-                const fileRef = storageRef(storage, participation.fileUrl);
-                await deleteObject(fileRef);
+                // Delete the private Storage object by its stable path when audio exists.
+                if (participation.storagePath) {
+                    const fileRef = storageRef(storage, participation.storagePath);
+                    await deleteObject(fileRef);
+                }
 
                 // Delete the document from Firestore
                 const docRef = doc(firestore, 'participations', participation.docid);
