@@ -22,8 +22,12 @@ describe('newsletter direct-load safety', () => {
     );
   });
 
-  it('keeps unauthenticated users behind the existing login redirect', () => {
+  it('keeps unauthenticated and unauthorized users behind the login redirect', () => {
     assert.match(middlewareSource, /const user\s*=\s*await getCurrentUser\(\)/u);
-    assert.match(middlewareSource, /to\.name\s*!==\s*["']login["'][\s\S]*navigateTo\(["']\/login["']\)/u);
+    assert.match(middlewareSource, /if\s*\(!user\)[\s\S]*navigateTo\(["']\/login["']\)/u);
+    assert.match(
+      middlewareSource,
+      /const authorized\s*=\s*await authorizeBackOfficeUser\(user\)[\s\S]*if\s*\(!authorized\)[\s\S]*path:\s*["']\/login["']/u
+    );
   });
 });
