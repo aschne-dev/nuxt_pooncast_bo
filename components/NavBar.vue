@@ -23,35 +23,12 @@
 </template>
 
 <script setup>
-import { signOut } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore';
-const firestore = useFirestore()
-
-const auth = useFirebaseAuth() 
-const user = useCurrentUser()
-const userDetails = ref('null')
-
-
-const fetchUserDetails = async () => {
-  const userDocRef = doc(firestore, 'bo_users', user.value.uid);
-  
-  const userDoc = await getDoc(userDocRef);
-  //console.log('userDoc=' + JSON.stringify(userDoc))
-  if (userDoc.exists()) {
-    userDetails.value = userDoc.data();
-  } else {
-    //console.log('KO')
-  }
-};
-
-onMounted(() => {
-  if (user) {
-    fetchUserDetails();
-  }
-});
+const { authorizationProfile, logoutBackOfficeUser } = useBoAuthorization();
+const userDetails = computed(() => authorizationProfile.value || {});
 
 const handleLogout = async () => {
-  await signOut(auth)
+  await logoutBackOfficeUser();
+  await navigateTo('/login');
 };
 
 </script>

@@ -4,7 +4,11 @@
     <form @submit.prevent="login">
       <div><input v-model="email" type="email" placeholder="Email"/></div>
       <div><input v-model="password" type="password" placeholder="Password" class="mt-2" /></div>
-      <div class="text-center"><button class="btn mt-2"  type="submit">Login</button></div>
+      <div class="text-center">
+        <button class="btn mt-2" type="submit" :disabled="submitting">
+          {{ submitting ? 'Vérification…' : 'Login' }}
+        </button>
+      </div>
     </form>
     <div class="flex" v-if="error">
       <p class="text-primary text-xs bg-red-600 px-5 py-3 mt-3 rounded">{{ error }}</p>
@@ -15,17 +19,33 @@
 <script setup>
 import { signInWithEmailAndPassword } from 'firebase/auth'
 const auth = useFirebaseAuth() 
+const route = useRoute();
+const { authorizeBackOfficeUser } = useBoAuthorization();
 
 const email = ref('');
 const password = ref('');
-const error = ref('');
+const error = ref(
+  route.query.reason === 'unauthorized'
+    ? 'Vous n’êtes pas autorisé à accéder au back-office.'
+    : ''
+);
+const submitting = ref(false);
 
 const login = async () => {
+  submitting.value = true;
+  error.value = '';
   try {
-    await signInWithEmailAndPassword(auth, email.value, password.value);
-    navigateTo('/')
-  } catch (err) {
-    error.value = err.message;
+    const credential = await signInWithEmailAndPassword(auth, email.value, password.value);
+    const authorized = await authorizeBackOfficeUser(credential.user, { force: true });
+    if (!authorized) {
+      error.value = 'Vous n’êtes pas autorisé à accéder au back-office.';
+      return;
+    }
+    await navigateTo('/');
+  } catch (_error) {
+    error.value = 'Impossible de vous connecter.';
+  } finally {
+    submitting.value = false;
   }
 };
 </script>
