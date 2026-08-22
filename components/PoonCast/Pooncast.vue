@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-secondary flex flex-col w-96 mx-auto p-4 relative">
+  <div class="bg-secondary flex flex-col w-full max-w-4xl mx-auto p-4 relative">
     <div class="absolute flex items-center gap-2 z-10">
       <button v-if="!isUpdating" class="bg-gray-400 px-3 py-3 rounded-full opacity-80 hover:bg-primary" @click="startUpdating">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
@@ -39,16 +39,32 @@
     </div>
 
     <!-- TITRE-->
-    <h3 class="font-syne text-black font-bold text-xl pt-2">
+    <div class="font-syne text-black font-bold text-xl pt-2">
       <span v-if="!isUpdating">{{ pooncast.titre }}</span>
-      <textarea v-else v-model="titre" type="text" rows="3" class="w-full" /> 
-    </h3>
+      <div v-else>
+        <p class="mb-1 text-sm text-red-800">Titre public / historique protégé : il détermine l’URL.</p>
+        <textarea v-model="titre" type="text" rows="3" class="w-full" disabled />
+      </div>
+    </div>
 
     <!-- DESCRIPTION-->
     <p class="font-nunito text-black pt-2 leading-6 font-normal flex-grow">
       <span v-if="!isUpdating" v-html="pooncast.description"></span>
       <textarea v-else v-model="description" rows="5" type="text" class="w-full" /> 
     </p>
+
+    <template v-if="isUpdating">
+      <SeoCommonFields
+        :field-id="`pooncast-${pooncast.id}`"
+        v-model:seo-title="seoFields.seoTitle"
+        v-model:meta-description="seoFields.metaDescription"
+        v-model:faq="seoFields.faq"
+        v-model:related-content="seoFields.relatedContent"
+        :blogs="blogs"
+        :pooncasts="pooncasts"
+      />
+      <SeoEpisodeContentFields :field-id="`pooncast-${pooncast.id}`" v-model="seoContent" />
+    </template>
 
     
     <!-- AUDIO FILE -->
@@ -87,8 +103,14 @@ import { getStorage, ref as storageRef, deleteObject } from 'firebase/storage';
 import { useFirestore } from 'vuefire';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { usePooncastStore } from '@/stores/Pooncast/Pooncast';
+import { useBlogStore } from '@/stores/Blog/blog';
 import Player from '@/components/Pooncast/Player.vue';
 import PlatformsPlayer from './PlatformsPlayer.vue';
+import {
+  createEmptyEpisodeSeoContent,
+  createEmptySeoFields,
+  normalizeEpisodeEditorData,
+} from '@/utils/seo-content';
 
 const props = defineProps({
   pooncastId: String
@@ -96,6 +118,9 @@ const props = defineProps({
 
 const pooncastsStore = usePooncastStore();
 const pooncast = computed(() => pooncastsStore.pooncastById(props.pooncastId));
+const { pooncasts } = storeToRefs(pooncastsStore);
+const blogStore = useBlogStore();
+const { blogs } = storeToRefs(blogStore);
 const isUpdating = ref(false);
 
 // UPDATE MODEL
@@ -108,6 +133,8 @@ const apple = ref('');
 const podcastaddict = ref('');
 const amazon = ref('');
 const visuel = ref(null);
+const seoFields = ref(createEmptySeoFields());
+const seoContent = ref(createEmptyEpisodeSeoContent());
 
 // Initialiser les modèles de mise à jour avec les valeurs actuelles du pooncast
 const initializeUpdateModels = () => {
@@ -119,6 +146,21 @@ const initializeUpdateModels = () => {
   apple.value = pooncast.value.audio.apple;
   podcastaddict.value = pooncast.value.audio.podcastaddict;
   amazon.value = pooncast.value.audio.amazon;
+  seoFields.value = {
+    seoTitle: pooncast.value.seoTitle || '',
+    metaDescription: pooncast.value.metaDescription || '',
+    faq: (pooncast.value.faq || []).map((item) => ({ ...item })),
+    relatedContent: (pooncast.value.relatedContent || []).map((item) => ({ ...item })),
+  };
+  seoContent.value = {
+    shortAnswer: pooncast.value.seoContent?.shortAnswer || '',
+    sections: (pooncast.value.seoContent?.sections || []).map((section) => ({ ...section })),
+    keyFacts: [...(pooncast.value.seoContent?.keyFacts || [])],
+    activity: {
+      title: pooncast.value.seoContent?.activity?.title || '',
+      content: pooncast.value.seoContent?.activity?.content || '',
+    },
+  };
 };
 
 // Surveiller les changements dans pooncast et réinitialiser les modèles de mise à jour
@@ -131,24 +173,39 @@ const startUpdating = () => {
   initializeUpdateModels();
 };
 
+onMounted(async () => {
+  if (blogs.value.length === 0) {
+    await blogStore.fetchBlogs();
+  }
+});
+
 const stopUpdating = () => {
   isUpdating.value = false;
   // Logique pour enregistrer les changements si nécessaire
 };
 
 const updatePooncast = async () => {
-  const updatedData = {
-    episodeNumber: episodeNumber.value,
-    titre: titre.value,
-    description: description.value,
-    audio: {
-      fluxRss: fluxRss.value,
-      spotify: spotify.value,
-      apple: apple.value,
-      podcastaddict: podcastaddict.value,
-      amazon: amazon.value,
-    },  
-  };
+  let updatedData;
+
+  try {
+    updatedData = normalizeEpisodeEditorData({
+      episodeNumber: episodeNumber.value,
+      titre: titre.value,
+      description: description.value,
+      audio: {
+        fluxRss: fluxRss.value,
+        spotify: spotify.value,
+        apple: apple.value,
+        podcastaddict: podcastaddict.value,
+        amazon: amazon.value,
+      },
+      ...seoFields.value,
+      seoContent: seoContent.value,
+    });
+  } catch (validationError) {
+    alert(validationError.message);
+    return;
+  }
 
   await pooncastsStore.updatePooncast(pooncast.value.id, updatedData, visuel.value);
   stopUpdating();

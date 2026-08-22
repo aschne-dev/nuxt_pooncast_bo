@@ -1,6 +1,7 @@
-import { collection, addDoc, getDocs, query, orderBy, doc, getDoc, updateDoc, deleteDoc, runTransaction, where } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, doc, getDoc, updateDoc, deleteDoc, runTransaction, serverTimestamp, where } from 'firebase/firestore';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
+import { normalizeArticleEditorData } from '@/utils/seo-content';
 
 
 export const useBlogStore = defineStore({
@@ -57,7 +58,7 @@ export const useBlogStore = defineStore({
   
           
           const blogData = {
-            ...blog,
+            ...normalizeArticleEditorData(blog),
             visuel: imageUrl,
             createdAt: new Date(),
             userId: user.uid,
@@ -70,7 +71,7 @@ export const useBlogStore = defineStore({
           this.loading = false;
         } catch (error) {
           console.error('Error adding blog: ', error);
-          this.error = 'Error adding blog';
+          this.error = error.message || 'Error adding blog';
           this.loading = false;
         }
     },
@@ -92,7 +93,8 @@ export const useBlogStore = defineStore({
     
         // Construire l'objet de mise à jour
         const blogData = {
-          ...updatedBlog,
+          ...normalizeArticleEditorData(updatedBlog),
+          updatedAt: serverTimestamp(),
         };
         
         // Ajouter le champ `visuel` uniquement s'il est défini
@@ -118,7 +120,7 @@ export const useBlogStore = defineStore({
         this.loading = false;
       } catch (error) {
         console.error('Error editing blog: ', error);
-        this.error = 'Error editing blog';
+        this.error = error.message || 'Error editing blog';
         this.loading = false;
       }
     },

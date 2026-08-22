@@ -5,13 +5,15 @@
 
        <!-- TITRE -->
        <div class="mb-4 mt-5">
-        <label for="title" class="block mb-1 font-bold text-lg">Titre</label>
+        <label for="title" class="block mb-1 font-bold text-lg">Titre public / historique</label>
+        <p v-if="props.blog" class="mb-2 text-sm text-red-800">Protégé pendant l’édition : cette valeur détermine l’URL publique.</p>
         <textarea
           type="text"
           id="title"
           v-model="form.title"
           rows="2"
           required
+          :disabled="Boolean(props.blog)"
           class="w-full p-2 border border-gray-300 rounded"
         />
       </div>
@@ -74,6 +76,16 @@
         <button type="button" class="btn mt-2" @click="addChapter">Ajouter un chapitre</button>
       </div>
 
+      <SeoCommonFields
+        field-id="blog"
+        v-model:seo-title="form.seoTitle"
+        v-model:meta-description="form.metaDescription"
+        v-model:faq="form.faq"
+        v-model:related-content="form.relatedContent"
+        :blogs="blogs"
+        :pooncasts="pooncasts"
+      />
+
        <!-- Submit Button -->
        <div class="text-center mt-10 w-full">
         <button v-if="!props.blog"
@@ -96,6 +108,8 @@ import { QuillEditor } from '@vueup/vue-quill';
 import "@vueup/vue-quill/dist/vue-quill.snow.css"
 
 import { useBlogStore } from '@/stores/Blog/blog';
+import { usePooncastStore } from '@/stores/Pooncast/Pooncast';
+import { createEmptySeoFields, normalizeArticleEditorData } from '@/utils/seo-content';
 
 const props = defineProps({
   blog: Object
@@ -103,15 +117,29 @@ const props = defineProps({
 
 const blogStore = useBlogStore();
 const { loading } = storeToRefs(blogStore);
+const { blogs } = storeToRefs(blogStore);
+const pooncastStore = usePooncastStore();
+const { pooncasts } = storeToRefs(pooncastStore);
 const emit = defineEmits(['blogAdded'])
 
+const emptySeoFields = createEmptySeoFields();
 const form = ref({
   title: props.blog ? props.blog.title : '',
   intro: props.blog ? props.blog.intro : '',
-  chapters: props.blog ? props.blog.chapters : [{name:'', text: ''}]
+  chapters: props.blog ? (props.blog.chapters || []).map((chapter) => ({ ...chapter })) : [{name:'', text: ''}],
+  seoTitle: props.blog?.seoTitle || emptySeoFields.seoTitle,
+  metaDescription: props.blog?.metaDescription || emptySeoFields.metaDescription,
+  faq: (props.blog?.faq || emptySeoFields.faq).map((item) => ({ ...item })),
+  relatedContent: (props.blog?.relatedContent || emptySeoFields.relatedContent).map((item) => ({ ...item })),
 });
 
 const error = ref(null);
+
+onMounted(async () => {
+  if (pooncasts.value.length === 0) {
+    await pooncastStore.fetchPooncasts();
+  }
+});
 
 
 // VISUEL
@@ -151,7 +179,7 @@ const deleteChapter = (index) => {
 
 // SUBMIT
 const handleSubmit = async () => {
-  console.log("handle submit");
+  error.value = null;
 
   // Modifier le texte des chapitres pour ajouter les classes aux balises <ul> et <ol>
     form.value.chapters.forEach((chapter) => {
@@ -160,11 +188,14 @@ const handleSubmit = async () => {
       .replace(/<ol>/g, '<ol class="list-decimal list-inside">');
   });
 
-  const blog = {
-    title: form.value.title,
-    intro: form.value.intro,
-    chapters: form.value.chapters,
-  };
+  let blog;
+
+  try {
+    blog = normalizeArticleEditorData(form.value);
+  } catch (validationError) {
+    error.value = validationError.message;
+    return;
+  }
   
   //console.log("chapters:" + form.value.chapters[0].text)
 
@@ -180,6 +211,7 @@ const handleSubmit = async () => {
     form.value.title = '',
     form.value.intro = '';
     form.value.chapters = [{name:'', text: ''}];
+    Object.assign(form.value, createEmptySeoFields());
     visuel.value = null;
     imagePreview.value = null;
     blogStore.fetchBlogs();

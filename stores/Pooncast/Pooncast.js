@@ -1,9 +1,10 @@
 // stores/Pooncast.js
 import { defineStore } from 'pinia';
 import { useFirestore } from 'vuefire';
-import { collection, addDoc, getDocs, deleteDoc, updateDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, updateDoc, doc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
+import { normalizeEpisodeEditorData } from '@/utils/seo-content';
 
 export const usePooncastStore = defineStore('Pooncast', {
   state: () => ({
@@ -36,7 +37,7 @@ export const usePooncastStore = defineStore('Pooncast', {
         const nextEpisodeNumber = episodesInSeason.length > 0 ? Math.max(...episodesInSeason.map(e => e.episodeNumber)) + 1 : 1;
 
         const pooncastData = {
-          ...pooncast,
+          ...normalizeEpisodeEditorData(pooncast),
           visuel: imageUrl,
           createdAt: new Date(),
           userId: user.uid,
@@ -49,7 +50,7 @@ export const usePooncastStore = defineStore('Pooncast', {
         this.loading = false;
       } catch (error) {
         console.error('Error adding pooncast: ', error);
-        this.error = 'Error adding pooncast';
+        this.error = error.message || 'Error adding pooncast';
         this.loading = false;
       }
     },
@@ -80,7 +81,7 @@ export const usePooncastStore = defineStore('Pooncast', {
         const pooncast = this.pooncasts.find(p => p.id === pooncastId);
 
         // Delete the image from Firebase Storage
-        if (pooncast.visuel) {
+        if (pooncast?.visuel) {
           const imageRef = storageRef(storage, pooncast.visuel);
           await deleteObject(imageRef);
         }
@@ -89,7 +90,7 @@ export const usePooncastStore = defineStore('Pooncast', {
         this.pooncasts = this.pooncasts.filter(p => p.id !== pooncastId);
       } catch (error) {
         console.error('Error deleting pooncast: ', error);
-        this.error = 'Error deleting pooncast';
+        this.error = error.message || 'Error deleting pooncast';
       }
     },
     async updatePooncast(pooncastId, updatedData, newImageFile) {
@@ -101,10 +102,14 @@ export const usePooncastStore = defineStore('Pooncast', {
       try {
         const pooncastRef = doc(firestore, 'pooncasts', pooncastId);
         const pooncast = this.pooncasts.find(p => p.id === pooncastId);
+        const pooncastData = {
+          ...normalizeEpisodeEditorData(updatedData),
+          updatedAt: serverTimestamp(),
+        };
 
         if (newImageFile) {
           // Delete the old image from Firebase Storage
-          if (pooncast.visuel) {
+          if (pooncast?.visuel) {
             const oldImageRef = storageRef(storage, pooncast.visuel);
             await deleteObject(oldImageRef);
           }
@@ -112,20 +117,23 @@ export const usePooncastStore = defineStore('Pooncast', {
           // Upload the new image
           const newImageRef = storageRef(storage, `pooncast_images/${newImageFile.name}`);
           const snapshot = await uploadBytes(newImageRef, newImageFile);
-          updatedData.visuel = await getDownloadURL(snapshot.ref);
+          pooncastData.visuel = await getDownloadURL(snapshot.ref);
         }
 
         // Update Firestore document
-        await updateDoc(pooncastRef, updatedData);
+        await updateDoc(pooncastRef, pooncastData);
 
-        // Update local store
+        // Relire le document afin de conserver le Timestamp résolu par Firestore.
+        const updatedDoc = await getDoc(pooncastRef);
         const index = this.pooncasts.findIndex(p => p.id === pooncastId);
-        this.pooncasts[index] = { ...this.pooncasts[index], ...updatedData };
+        if (index !== -1 && updatedDoc.exists()) {
+          this.pooncasts[index] = { ...updatedDoc.data(), id: pooncastId };
+        }
 
         this.loading = false;
       } catch (error) {
         console.error('Error updating pooncast: ', error);
-        this.error = 'Error updating pooncast';
+        this.error = error.message || 'Error updating pooncast';
         this.loading = false;
       }
     },

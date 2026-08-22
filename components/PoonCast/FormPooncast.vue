@@ -1,7 +1,8 @@
 <template>
   <div class="mx-5 my-5 px-5 bg-primary font-fraunces rounded shadow">
     <form @submit.prevent="handleSubmit" class="flex flex-col">
-      <label class="pt-3 text-secondary">Titre:</label>
+      <label class="pt-3 text-secondary">Titre public / historique :</label>
+      <p class="text-sm text-red-800">Ce titre déterminera l’URL publique de l’épisode.</p>
       <input v-model="titre" type="text" placeholder="Titre" />
 
       <label class="pt-3 text-secondary">Description:</label>
@@ -25,6 +26,18 @@
       <label class="pt-3 text-secondary">Podcast Addict:</label>
       <textarea v-model="podcastaddict" placeholder="Lien Podcast Addict" rows="2" />
 
+      <SeoCommonFields
+        field-id="new-pooncast"
+        v-model:seo-title="seoFields.seoTitle"
+        v-model:meta-description="seoFields.metaDescription"
+        v-model:faq="seoFields.faq"
+        v-model:related-content="seoFields.relatedContent"
+        :blogs="blogs"
+        :pooncasts="pooncasts"
+      />
+
+      <SeoEpisodeContentFields field-id="new-pooncast" v-model="seoContent" />
+
       <button class="btn my-3 text-black font-bold uppercase" :disabled="loading">
         <span v-if="loading">Adding...</span>
         <span v-else>Ajouter l'épisode</span>
@@ -36,6 +49,12 @@
 
 <script setup>
 import { usePooncastStore } from '~/stores/Pooncast/Pooncast';
+import { useBlogStore } from '~/stores/Blog/blog';
+import {
+  createEmptyEpisodeSeoContent,
+  createEmptySeoFields,
+  normalizeEpisodeEditorData,
+} from '~/utils/seo-content';
 
 const props = defineProps({
   seasonId: Number
@@ -53,7 +72,18 @@ const amazon = ref('');
 const visuel = ref(null);
 
 const pooncastStore = usePooncastStore();
+const { pooncasts } = storeToRefs(pooncastStore);
+const blogStore = useBlogStore();
+const { blogs } = storeToRefs(blogStore);
 const error = ref(null);
+const seoFields = ref(createEmptySeoFields());
+const seoContent = ref(createEmptyEpisodeSeoContent());
+
+onMounted(async () => {
+  if (blogs.value.length === 0) {
+    await blogStore.fetchBlogs();
+  }
+});
 
 const handleFileChange = (event) => {
   const file = event.target.files[0];
@@ -65,23 +95,32 @@ const handleFileChange = (event) => {
 const handleSubmit = async () => {
   error.value = null;
 
-  if (!titre.value || !description.value || !fluxRss || !spotify.value || !apple.value || !podcastaddict.value || !amazon.value || !visuel.value) {
+  if (!titre.value || !description.value || !fluxRss.value || !spotify.value || !apple.value || !podcastaddict.value || !amazon.value || !visuel.value) {
     error.value = 'Veuillez remplir tous les champs.';
     return;
   }
 
-  const pooncast = {
-    saison: props.seasonId,
-    titre: titre.value,
-    description: description.value,
-    audio: {
-      fluxRss: fluxRss.value,
-      spotify: spotify.value,
-      apple: apple.value,
-      podcastaddict: podcastaddict.value,
-      amazon: amazon.value,
-    },        
-  };
+  let pooncast;
+
+  try {
+    pooncast = normalizeEpisodeEditorData({
+      saison: props.seasonId,
+      titre: titre.value,
+      description: description.value,
+      audio: {
+        fluxRss: fluxRss.value,
+        spotify: spotify.value,
+        apple: apple.value,
+        podcastaddict: podcastaddict.value,
+        amazon: amazon.value,
+      },
+      ...seoFields.value,
+      seoContent: seoContent.value,
+    });
+  } catch (validationError) {
+    error.value = validationError.message;
+    return;
+  }
 
   await pooncastStore.addPooncast(pooncast, visuel.value);
 
@@ -94,6 +133,8 @@ const handleSubmit = async () => {
     podcastaddict.value = '';
     amazon.value = '';
     visuel.value = null;
+    seoFields.value = createEmptySeoFields();
+    seoContent.value = createEmptyEpisodeSeoContent();
     emit('pooncastAdded');
   } else {
     error.value = 'Erreur lors de l\'ajout du pooncast';

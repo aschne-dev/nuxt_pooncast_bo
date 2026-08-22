@@ -14,6 +14,9 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
+    externals: {
+      traceInclude: ["./node_modules/firebase-functions/lib/v1/index.js"],
+    },
     firebase: {
       gen: 2,
       nodeVersion: "22",
