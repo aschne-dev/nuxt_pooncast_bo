@@ -69,6 +69,7 @@ test('les sauvegardes BO écrivent updatedAt mais protègent les titres historiq
   ]);
 
   assert.match(articleForm, /:disabled="Boolean\(props\.blog\)"/);
+  assert.match(articleForm, /type="button"[^>]*class="bg-red-500[^>]*@click="confirmDeleteChapter\(index\)"/);
   assert.match(episodeForm, /v-model="titre"[^>]*disabled/);
   assert.match(articleStore, /updatedAt: serverTimestamp\(\)/);
   assert.match(episodeStore, /updatedAt: serverTimestamp\(\)/);
